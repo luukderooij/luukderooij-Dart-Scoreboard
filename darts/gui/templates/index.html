@@ -1,0 +1,193 @@
+{% include 'header.html' %}
+
+<!-- Main  -->
+
+<div class="container-fluid main">
+
+    <div class="container-fluid wrapper">
+
+        <h1>SCOREBOARD</h1>
+
+    </div>
+
+</div>
+
+<div class="container-fluid">
+
+    <div class="d-grid gap-5">
+
+        <!-- Meeste avondswins -->
+
+        <div>
+
+            <div style="background-color: #222; color: #fff;">
+
+                <h3 style="padding-top: 0.8rem; padding-bottom: 0.8rem; padding-left: 16px">AVONDWINNAAR</h3>
+
+            </div>
+
+            <!-- Tabulator winners table -->
+
+            <div id="winners_scoreboard_table"></div>
+
+        </div>
+
+        <!-- Meeste hondertachtig -->
+
+        <div>
+
+            <div style="background-color: #222; color: #fff;">
+
+                <h3 style="padding-top: 0.8rem; padding-bottom: 0.8rem; padding-left: 16px">MEESTE 180</h3>
+
+            </div>
+
+            <!-- Tabulator onehunderdandeigthy table -->
+
+            <div id="onehunderdandeigthy_table"></div>
+
+        </div>
+
+        <!-- Hoogste finish -->
+
+        <div>
+
+            <div style="background-color: #222; color: #fff;">
+
+                <h3 style="padding-top: 0.8rem; padding-bottom: 0.8rem; padding-left: 16px">HOOGSTE FINISH</h3>
+
+            </div>
+
+            <!-- Tabulator finishes table -->
+
+            <div id="finishes_scoreboard_table"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% include 'footer.html' %}
+
+<script>
+    // --- Winners for scoreboard ---
+    function winnersScoreboard() {
+        let data = { "type": "winners_scoreboard" };
+        let url = '/api/get/winners';
+
+        let response = post(url, data).then(response => {
+
+            var customMutatorName = function (value, data, type, params, component) {
+                return data.firstname + " " + "'" + data.nickname + "'" + " " + data.lastname;
+            }
+
+            var customMutatorDate = function (value, data, type, params, component) {
+                let currentDate = new Date(data.last_date);
+                let date = currentDate.getDate();
+                let month = currentDate.getMonth();
+                let year = currentDate.getFullYear();
+                let dateMonthYear = date + "/" + month + "/" + year;
+                return dateMonthYear
+            }
+
+            var winnersScoreboardTable = new Tabulator("#winners_scoreboard_table", {
+                data: response, //set initial table data
+                // layout: "fitDataStretch",
+                layout: "fitColumns",
+                resizableColumnFit: true,
+
+                columns: [
+                    { title: "#", field: "id", resizable: true },
+                    { title: "NAAM", field: "fullname", resizable: true, mutator: customMutatorName },
+                    { title: "SCORE", field: "score", resizable: true },
+                    { title: "DATE", field: "last_date", resizable: true, mutator: customMutatorDate }
+                ]
+            });
+        });
+    }
+
+
+    function onehunderdandeigthy() {
+        let data = { "type": "onehunderdandeigthy" };
+        let url = '/api/get/onehunderdandeighty';
+
+        let response = post(url, data).then(response => {
+
+            var customMutatorName = function (value, data, type, params, component) {
+                return data.firstname + " " + "'" + data.nickname + "'" + " " + data.lastname;
+            }
+            var customMutatorDate = function (value, data, type, params, component) {
+                let currentDate = new Date(data.last_date);
+                let date = currentDate.getDate();
+                let month = currentDate.getMonth();
+                let year = currentDate.getFullYear();
+                let dateMonthYear = date + "/" + month + "/" + year;
+                return dateMonthYear
+            }
+
+            var onehunderdandeigthy_table = new Tabulator("#onehunderdandeigthy_table", {
+                data: response, //set initial table data
+                // layout: "fitDataStretch",
+                layout: "fitColumns",
+                resizableColumnFit: true,
+
+                columns: [
+                    { title: "#", field: "id", resizable: true },
+                    { title: "NAAM", field: "fullname", resizable: true, mutator: customMutatorName },
+                    { title: "SCORE", field: "score", resizable: true },
+                    { title: "DATE", field: "last_date", resizable: true, mutator: customMutatorDate }
+                ]
+            });
+        });
+    }
+
+
+    function finishesScoreboard() {
+        let data = { "type": "finishes" };
+        let url = '/api/get/finishes';
+
+        let response = post(url, data).then(response => {
+
+            var customMutatorName = function (value, data, type, params, component) {
+                return data.firstname + " " + "'" + data.nickname + "'" + " " + data.lastname;
+            }
+            var customMutatorDate = function (value, data, type, params, component) {
+                let currentDate = new Date(data.date);
+                let date = currentDate.getDate();
+                let month = currentDate.getMonth();
+                let year = currentDate.getFullYear();
+                let dateMonthYear = date + "/" + month + "/" + year;
+                return dateMonthYear
+            }
+
+            var finishes_scoreboard_table = new Tabulator("#finishes_scoreboard_table", {
+                data: response, //set initial table data
+                // layout: "fitDataStretch",
+                layout: "fitColumns",
+                resizableColumnFit: true,
+
+                columns: [
+                    { title: "#", field: "id", resizable: true },
+                    { title: "NAAM", field: "fullname", resizable: true, mutator: customMutatorName },
+                    { title: "SCORE", field: "score", resizable: true },
+                    { title: "COMBINATIE", field: "combi", resizable: true },
+                    { title: "DATE", field: "date", resizable: true, mutator: customMutatorDate }
+                ]
+            });
+        });
+    }
+
+
+
+
+    setInterval(() => { // send a request to server each 5 seconds (REFRESH_INTERVAL) <- you can change it here
+        winnersScoreboard()
+        onehunderdandeigthy()
+        finishesScoreboard()
+    }, 30 * 1000)
+
+    winnersScoreboard()
+    onehunderdandeigthy()
+    finishesScoreboard()
+</script>
