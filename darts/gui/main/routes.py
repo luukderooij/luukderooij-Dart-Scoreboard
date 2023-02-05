@@ -2,7 +2,7 @@
 import logging
 import datetime
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, Flask, redirect, request, render_template, send_file, session, jsonify, abort, make_response, flash, send_from_directory, send_file
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -92,13 +92,13 @@ def scoreboard():
                             finishes=Finishes().sorted())
 
 
-@main.template_filter()
-def format_datetime(value, format="%d-%m-%Y"):
-    """Format a date time to (Default): d Mon YYYY HH:MM P"""
-    date = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
-    if value is None:
-        return ""
-    return datetime.strftime(date, format)
+# @main.template_filter()
+# def format_datetime(value, format="%d-%m-%Y"):
+#     """Format a date time to (Default): d Mon YYYY HH:MM P"""
+#     date = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
+#     if value is None:
+#         return ""
+#     return datetime.strftime(date, format)
 
 
 @main.route('/log')

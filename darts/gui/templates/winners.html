@@ -1,0 +1,79 @@
+{% include 'header.html' %}
+
+<!-- Main  -->
+
+<div class="container-fluid main">
+
+    <div class="container-fluid wrapper">
+
+        <h1>Toernooi</h1>
+
+    </div>
+
+</div>
+
+<div class="container-fluid">
+
+    <div class="container-lg" id="winner">
+
+        <h1 id="winner_h1"></h1>
+
+        <input type="file" name="image" accept="image/*;capture=camera">
+
+        <div id="image_winner"></div>
+
+    </div>
+
+
+
+</div>
+
+
+{% include 'footer.html' %}
+
+
+<script>
+
+
+
+
+
+    function checkForWinner() {
+
+        const url = '/api/get/playoffs/winner'
+        let data = { status: 'ok' }
+        let = response = post(url, data)
+            .then(response => {
+
+                let status = (response.status === "true")
+
+                if (status == false) {
+                    console.log('geen winnaar')
+                }
+                if (status == true) {
+
+
+                    // const winnerDiv = document.getElementById('winner');
+                    // winnerDiv.style.display = 'block'
+
+                    // document.getElementById("winner_h1").innerHTML = response.winner;
+                }
+            })
+    }
+
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        Table()
+        checkForWinner()
+
+        const winnerDiv = document.getElementById('winner');
+        winnerDiv.style.display = 'none'
+
+    });
+
+
+
+
+</script>

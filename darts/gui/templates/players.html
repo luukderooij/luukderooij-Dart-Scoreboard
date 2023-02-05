@@ -1,0 +1,119 @@
+{% include 'header.html' %}
+
+<!-- Main  -->
+
+<div class="container-fluid main">
+
+    <div class="container-fluid wrapper">
+
+        <h1>PLAYERS</h1>
+
+    </div>
+
+</div>
+
+<div class="container-fluid">
+
+    <button type="button" onclick="addPlayer()" class=" btn btn-success" style="margin-bottom: 2rem">Speler
+        toevoegen</button>
+
+    <div id="players_table"></div>
+
+</div>
+
+<!-- Add player Modal -->
+<div class="modal" id="addPlayerModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Speler toevoegen</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form method="POST" action="/api/add/player">
+                    {{ form.hidden_tag() }}
+
+                    <label for="fname" class="form-label">Voornaam</label>
+                    {{ form.firstname(class="form-control", placeholder="Voornaam") }}
+
+                    <label for="lname" class="form-label">Achternaam</label>
+                    {{ form.lastname(class="form-control", placeholder="Achternaam") }}
+
+                    <label for="nname" class="form-label">Bijnaam</label>
+                    {{ form.nickname(class="form-control", placeholder="Bijnaam") }}
+
+                    <label for="aname" class="form-label">Arcade</label>
+                    {{ form.arcadename(class="form-control", placeholder="Arcadenaam (3 Letters)") }}
+
+                    <label for="email" class="form-label">E-mail</label>
+                    {{ form.email(class="form-control", placeholder="John@Doe.nl") }}
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                {{ form.submit(class="btn btn-success", value="Toevoegen")}}
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Edit player Modal -->
+<div class="modal" id="editPlayerModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Speler aanpassen</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form method="POST" action="/api/update/player">
+                    {{ form.hidden_tag() }}
+
+                    {{ form.id(type="hidden", id="Formid", value="") }}
+
+                    <label for="fname" class="form-label">Voornaam</label>
+                    {{ form.firstname(class="form-control", id="FormFirstname", value="") }}
+
+                    <label for="lname" class="form-label">Achternaam</label>
+                    {{ form.lastname(class="form-control", id="FormLastname", value="") }}
+
+                    <label for="nname" class="form-label">Bijnaam</label>
+                    {{ form.nickname(class="form-control", id="FormNickname", value="") }}
+
+                    <label for="aname" class="form-label">Arcade</label>
+                    {{ form.arcadename(class="form-control", id="FormArcadename", value="") }}
+
+                    <label for="email" class="form-label">E-mail</label>
+                    {{ form.email(class="form-control", id="FormEmail", value="") }}
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" id="removeButton" class="btn btn-danger" onclick="removePlayer(this.value)"
+                    data-bs-dismiss="modal" value="">Verwijderen</button>
+                {{ form.submit(class="btn btn-success", value="Aanpassen")}}
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% include 'footer.html' %}
+
+<script>
+    players()
+</script>

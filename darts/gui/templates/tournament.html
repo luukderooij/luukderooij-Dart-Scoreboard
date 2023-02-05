@@ -1,0 +1,232 @@
+{% include 'header.html' %}
+
+<!-- Main  -->
+
+<div class="container-fluid main">
+
+    <div class="container-fluid wrapper">
+
+        <h1>Toernooi</h1>
+
+    </div>
+
+</div>
+
+
+
+<div class="container-fluid">
+
+    <div class="container-lg">
+
+        <div class="row">
+
+            <div id="tournament-score-table"></div>
+
+        </div>
+
+        <div class="row mt-5">
+
+            <h1>Tussenstand</h1>
+
+            <table class="table table-bordered" id="standings-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Poule</th>
+                        <th>Plaats</th>
+                        <th>Speler</th>
+                        <th>Wedstrijden gespeeld</th>
+                        <th>Wedstrijden gewonnen</th>
+                        <th>Wedstrijden verloren</th>
+                        <th>Legs gewonnen</th>
+                        <th>Legs verloren</th>
+                        <th>Legs verschil</th>
+                    </tr>
+
+                </thead>
+
+            </table>
+
+        </div>
+
+        <div class="row">
+
+            <button class="button" onclick="createPlayoffs()">Create Playoffs</button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% include 'footer.html' %}
+
+<script>
+
+
+    function createPlayoffs() {
+        const urlCreatePlayoffs = '/api/create/playoffs'
+        let rounds = parseInt(prompt('Selecteer aantal rondes'))
+        let data = { rounds: rounds }
+        let = response = GetData(urlCreatePlayoffs, data)
+            .then(response => {
+                let status = response.status
+                if (status == false) {
+                    alert(response.message)
+                    if (response.message === 'Playoffs already created!') {
+                        location.replace(window.location.href = "/playoffs")
+                    }
+                }
+                if (status == true) {
+
+                    location.replace(window.location.href = "/playoffs")
+                }
+
+            })
+    }
+
+
+
+    async function PostData(url, data) {
+        // '/api/get_player'
+        const response = await fetch(url, {
+            method: "POST",
+            credentials: "include",
+            body: JSON.stringify(data),
+            cache: "no-cache",
+            headers: new Headers({
+                "content-type": "application/json"
+            })
+        })
+        return
+    }
+
+    async function GetData(url, data) {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+
+        // Error
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        let jsonData = await response.json();
+        return jsonData;
+    }
+
+    async function Table() {
+        let url = '/api/get/matches/'
+        let tournament_id = { tournament_id: '0' }
+        let jsonData = await GetData(url, tournament_id)
+
+        var table = new Tabulator("#tournament-score-table", {
+            data: jsonData, //set initial table data
+            layout: "fitDataStretch",
+            columns: [
+                { title: "TOURNAMENT ID", field: "tournament_id", resizable: false, visible: false },
+                { title: "POOL", field: "pool", resizable: false },
+                { title: "WEDSTRIJD", field: "match_id", resizable: false },
+                { title: "BORD", field: "board", resizable: false },
+                { title: "SPELER 1", field: "player_1", resizable: false },
+                { title: "SCORE", field: "score_1", validator: "integer", editor: true, resizable: false },
+                { title: "SPELER 2", field: "player_2", resizable: false },
+                { title: "SCORE", field: "score_2", validator: "integer", editor: true, resizable: false },
+                { title: "SCHEIDSRECHTER", field: "referee", resizable: false },
+            ],
+        });
+
+        table.on('cellEdited', (cell) => {
+            var data = cell.getData();
+            let url = '/api/update/tournament'
+            PostData(url, data).then(function () {
+                Update_Standings();
+            },);
+
+        })
+    }
+
+    async function Standings() {
+        const table = document.getElementById('standings-table')
+        const tbody = document.createElement('tbody')
+        tbody.setAttribute("id", "standings-table-body")
+
+        let url = '/api/get/tournament/standings/'
+        let tournament_id = { tournament_id: '0' }
+        let jsonData = await GetData(url, tournament_id)
+
+        for (let standing of jsonData) {
+            var row = `<tr>
+                    <td>${standing.pool}</td>
+                    <td>${standing.pos}</td>
+                    <td>${standing.name}</td>
+                    <td>${standing.matches_played}</td>
+                    <td>${standing.matches_won}</td>
+                    <td>${standing.matches_lost}</td>
+                    <td>${standing.legs_scored}</td>
+                    <td>${standing.legs_against}</td>
+                    <td>${standing.legs_difference}</td>
+                  </tr>`
+
+            tbody.innerHTML += row
+        }
+        table.appendChild(tbody)
+    }
+
+    async function Update_Standings() {
+        const table = document.getElementById('standings-table')
+        const new_table_body = document.createElement('tbody');
+        new_table_body.setAttribute("id", "standings-table-body")
+        const old_table_body = document.getElementById('standings-table-body')
+
+
+        if (old_table_body) {
+            let url = '/api/get/tournament/standings/'
+            let tournament_id = { tournament_id: '0' }
+            let jsonData = await GetData(url, tournament_id)
+
+            for (let standing of jsonData) {
+                var row = `<tr>
+                        <td>${standing.pool}</td>
+                        <td>${standing.pos}</td>
+                        <td>${standing.name}</td>
+                        <td>${standing.matches_played}</td>
+                        <td>${standing.matches_won}</td>
+                        <td>${standing.matches_lost}</td>
+                        <td>${standing.legs_scored}</td>
+                        <td>${standing.legs_against}</td>
+                        <td>${standing.legs_difference}</td>
+                    </tr>`
+
+                new_table_body.innerHTML += row
+
+            }
+            table.replaceChild(new_table_body, old_table_body)
+        } else {
+            Standings()
+        }
+
+    }
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        Table()
+        Standings()
+    });
+
+    // $(document).ready(function () {
+    //     Table()
+    //     Standings()
+    // })
+
+
+
+
+</script>
