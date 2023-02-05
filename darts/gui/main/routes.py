@@ -31,12 +31,12 @@ class RegistrationForm(FlaskForm):
 
 
 @main.route('/')
-@app.route('/index')
+@main.route('/index')
 def index():
     return render_template('index.html')
 
 
-@app.route('/players', methods=['GET', 'POST'])
+@main.route('/players', methods=['GET', 'POST'])
 def players():
     form = RegistrationForm()
     return render_template('players.html',
@@ -44,47 +44,47 @@ def players():
                             form = form)
 
 
-@app.route('/180', methods=['GET', 'POST'])
+@main.route('/180', methods=['GET', 'POST'])
 def onehunderdandeighty():
     return render_template('180.html')
 
 
-@app.route('/winner', methods=['GET', 'POST'])
+@main.route('/winner', methods=['GET', 'POST'])
 def winner():
     return render_template('winner.html')
 
 
-@app.route('/finishes', methods=['GET', 'POST'])
+@main.route('/finishes', methods=['GET', 'POST'])
 def finishes():
     return render_template('finishes.html')
 
 
-@app.route('/create-tournament')
+@main.route('/create-tournament')
 def createtournament():
     return render_template('create-tournament.html')
 
 
-@app.route('/tournament')
+@main.route('/tournament')
 def tournament():
     return render_template('tournament.html')
 
 
-@app.route('/playoffs')
+@main.route('/playoffs')
 def playoffs():
     return render_template('playoffs.html')
 
 
-@app.route('/winners')
+@main.route('/winners')
 def winners():
     return render_template('winners.html')
 
 
-@app.route('/rules')
+@main.route('/rules')
 def rules():
     return render_template('rules.html')    
 
 
-@app.route('/tv/scoreboard')
+@main.route('/tv/scoreboard')
 def scoreboard():
     return render_template('/tv/scoreboard.html',
                             winners=Winners().sorted(),
@@ -92,7 +92,7 @@ def scoreboard():
                             finishes=Finishes().sorted())
 
 
-@app.template_filter()
+@main.template_filter()
 def format_datetime(value, format="%d-%m-%Y"):
     """Format a date time to (Default): d Mon YYYY HH:MM P"""
     date = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
@@ -101,7 +101,6 @@ def format_datetime(value, format="%d-%m-%Y"):
     return datetime.strftime(date, format)
 
 
-@app.route('/log')
-@app.route('/log.html')
+@main.route('/log')
 def log():
     return render_template('log.html')
