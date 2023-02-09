@@ -6,6 +6,7 @@ from waitress import serve
 from darts import settings
 from darts.config import Configuration
 from darts.gui import app
+from darts.dartdb import dartDB
 
 
 class Darts:
@@ -36,6 +37,8 @@ class Darts:
 
         logger.info('Logger started!')
 
+        with dartDB(settings.DB_FILE) as db:
+            db.create_tables()
 
         if settings.DEVELOPMENT:
             app.run(debug=True, host=settings.WEB_HOST, port=settings.WEB_PORT)
