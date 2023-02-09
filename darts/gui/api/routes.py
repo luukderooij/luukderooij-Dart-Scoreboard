@@ -242,7 +242,8 @@ def api_add_tournament():
     selected_players_list = []
 
     for players in selected_players:
-        player = players['firstname'] + ' "' + players['nickname'] + '" ' + players['lastname'] 
+        #player = players['firstname'] + ' "' + players['nickname'] + '" ' + players['lastname'] 
+        player = players['nickname']
         selected_players_list.append(player)
 
     try:
