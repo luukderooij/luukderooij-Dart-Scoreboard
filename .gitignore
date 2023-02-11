@@ -132,3 +132,4 @@ dmypy.json
 config.ini 
 darts.log
 darts.db
+uploads/
