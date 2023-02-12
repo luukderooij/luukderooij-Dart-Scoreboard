@@ -1,8 +1,7 @@
 
 import logging
-import datetime
 
-from flask import Blueprint, render_template, Flask, redirect, request, render_template, send_file, session, jsonify, abort, make_response, flash, send_from_directory, send_file
+from flask import Blueprint, render_template, render_template
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -10,10 +9,6 @@ from wtforms.validators import DataRequired, Length, Email, Optional
 
 
 from darts.players import Players
-from darts.toneighty import TonEighty
-from darts.winners import Winners
-from darts.finishes import Finishes
-
 
 logger = logging.getLogger(__name__)
 
@@ -82,24 +77,7 @@ def winners():
 @main.route('/rules')
 def rules():
     return render_template('rules.html')    
-
-
-@main.route('/tv/scoreboard')
-def scoreboard():
-    return render_template('/tv/scoreboard.html',
-                            winners=Winners().sorted(),
-                            toneightys=TonEighty().sorted(),
-                            finishes=Finishes().sorted())
-
-
-# @main.template_filter()
-# def format_datetime(value, format="%d-%m-%Y"):
-#     """Format a date time to (Default): d Mon YYYY HH:MM P"""
-#     date = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
-#     if value is None:
-#         return ""
-#     return datetime.strftime(date, format)
-
+    
 
 @main.route('/log')
 def log():

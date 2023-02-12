@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="refresh" content="30">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/scoreboard-style.css') }}">
+	<title>Scoreboard Dubbel 1</title>
+</head>
+
+<body>
+
+	<div class="container">
+		<header class="header">
+			<h2>Dartclub Dubbel 1</h2>
+		</header>
+
+		<article class="scoreboard">
+			{% if bracket_winner != None%}
+			<div>
+				<h1>Winnaar: {{ bracket_winner }}</h1><br><br>
+			</div>
+			<div id="image_winner">
+				{% endif %}
+		</article>
+
+		<article class="scoreboard" id="scoreboardluuk">
+
+
+			{% for a in info %}
+			<td class="tg-0lax">Name: </td>
+			<td class="tg-0lax">{{ a[2] }}</td><br><br>
+			<td class="tg-0lax">Datum: </td>
+			<td class="tg-0lax">{{ a[6] }}</td><br><br>
+
+			{% endfor %}
+
+
+
+
+			<style type="text/css">
+				.tg {
+					border-collapse: collapse;
+					border-spacing: 0;
+				}
+
+				.tg td {
+					border-color: black;
+					border-style: solid;
+					border-width: 1px;
+					font-family: Arial, sans-serif;
+					font-size: 14px;
+					overflow: hidden;
+					padding: 10px 5px;
+					word-break: normal;
+				}
+
+				.tg th {
+					border-color: black;
+					border-style: solid;
+					border-width: 1px;
+					font-family: Arial, sans-serif;
+					font-size: 14px;
+					font-weight: normal;
+					overflow: hidden;
+					padding: 10px 5px;
+					word-break: normal;
+				}
+
+				.tg .tg-0lax {
+					text-align: left;
+					vertical-align: top
+				}
+			</style>
+			<table class="tg">
+				<thead>
+					<tr>
+						<th class="tg-0lax">Pool</th>
+						<th class="tg-0lax">Match</th>
+						<th class="tg-0lax">Bord</th>
+						<th class="tg-0lax">Player 1</th>
+						<th class="tg-0lax">Score</th>
+						<th class="tg-0lax">Player 2</th>
+						<th class="tg-0lax">Score</th>
+						<th class="tg-0lax">Referee</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for match in matches %}
+					<tr>
+						<td class="tg-0lax">{{ match[1] }}</td>
+						<td class="tg-0lax">{{ match[2] }}</td>
+						<td class="tg-0lax">{{ match[9] }}</td>
+						<td class="tg-0lax">{{ match[3] }}</td>
+						<form id="score-form" method="post" action="/tournament.html">
+							{% if "Player1" in score%}
+							{% if match[2] == matchid and match[1] == poolid %}
+							<td class="tg-0lax"><input type="number" name="score1" placeholder={{match[4]}}></td>
+							{% else %}
+							<td class="tg-0lax">{{ match[4] }}</td>
+							{% endif %}
+							{% else %}
+							<td class="tg-0lax">{{ match[4] }}</td>
+							{% endif %}
+							<td class="tg-0lax">{{ match[5] }}</td>
+							{% if "Player2" in score%}
+							{% if match[2] == matchid and match[1] == poolid %}
+							<td class="tg-0lax"><input type="number" id="score2132113" name="score2"
+									placeholder={{match[6]}}></td>
+							{% else %}
+							<td class="tg-0lax">{{ match[6] }}</td>
+							{% endif %}
+							{% else %}
+							<td class="tg-0lax">{{ match[6] }}</td>
+							{% endif %}
+
+							<td class="tg-0lax">{{ match[7] }}</td>
+
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+
+
+			{% if scoreboard %}
+			<table class="tg">
+				<thead>
+					<tr>
+						<th class="tg-0lax">NR</th>
+						<th class="tg-0lax">Calculated</th>
+						<th class="tg-0lax">Player</th>
+						<th class="tg-0lax">Wins</th>
+						<th class="tg-0lax">Legs</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for x in scoreboard %}
+					<tr>
+						<td class="tg-0lax">{{loop.index}}</td>
+						<td class="tg-0lax">{{ x[1] }}</td>
+						<td class="tg-0lax">{{ x[2] }}</td>
+						<td class="tg-0lax">{{ x[3] }}</td>
+						<td class="tg-0lax">{{ x[4] }}</td>
+						{% endfor %}
+				</tbody>
+			</table>
+			{% endif %}
+
+
+			{% for x in bracketdata %}
+			<table class="tg">
+				<thead>
+					<tr>
+						<th class="tg-0lax">Round</th>
+						<th class="tg-0lax">Match</th>
+						<th class="tg-0lax">Board</th>
+						<th class="tg-0lax">Player 1</th>
+						<th class="tg-0lax">Score 1</th>
+						<th class="tg-0lax">Player 2</th>
+						<th class="tg-0lax">Score 2</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="tg-0lax">{{ x[1] }}</td>
+						<td class="tg-0lax">{{ x[2] }}</td>
+						<td class="tg-0lax">{{ x[3] }}</td>
+						<td class="tg-0lax">{{ x[4] }}</td>
+						<td class="tg-0lax">{{ x[5] }}</td>
+						<td class="tg-0lax">{{ x[6] }}</td>
+						<td class="tg-0lax">{{ x[7] }}</td>
+					</tr>
+
+					<body>
+			</table><br><br>
+
+			{% endfor %}
+
+
+
+
+		</article>
+		<footer class="footer">
+			footer
+		</footer>
+	</div>
+
+	<footer class="footer">
+		Made by Luuk Pro & Markel van Gerwen
+	</footer>
+
+</body>
+
+
+<script>
+
+	async function GetURL(url) {
+		const response = await fetch(url);
+		if (response.status === 200) {
+			show_image()
+			return response;
+		}
+	}
+
+
+	async function PostData(url, data) {
+		// '/api/get_player'
+		const response = await fetch(url, {
+			method: "POST",
+			credentials: "include",
+			body: data,
+			cache: "no-cache",
+			// headers: new Headers({
+			//     "content-type": "application/json"
+			// })
+		})
+		return
+	}
+
+	function show_image() {
+
+		var img = document.createElement("img");
+		img.src = "/api/upload/image/";
+		img.setAttribute("height", "768");
+		img.setAttribute("width", "1024");
+		document.getElementById("image_winner").appendChild(img);
+		document.getElementById("scoreboardluuk").style.display = 'none';
+	}
+
+
+	document.addEventListener("DOMContentLoaded", function () {
+		let url = '/api/upload/image/'
+		let jsonData = GetURL(url)
+
+	});
+
+
+
+</script>
+
+</html>
