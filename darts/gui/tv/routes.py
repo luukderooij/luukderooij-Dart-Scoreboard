@@ -11,11 +11,10 @@ from darts.playoffs import Playoffs
 
 logger = logging.getLogger(__name__)
 
-tv = Blueprint('tv', __name__, template_folder='templates', static_folder='static', static_url_path='/static')
+tv = Blueprint('tv', __name__, template_folder='tvtemplates', static_folder='static', static_url_path='/tv/static')
 
 
 @tv.route('/tv/tournament')
-@tv.route('/tv/tournament.html')
 def tournamenttv():
     SCORE = {}
 
@@ -54,7 +53,7 @@ def tournamenttv():
     except:
         bracket_winner = None
         logger.info("Something went wrong in winner_bracket.")  
-    return render_template('/tournament.html', matches=TOURNAMENT, 
+    return render_template('/tournamentt.html', matches=TOURNAMENT, 
                                                   info=TOURNAMENT_INFO, 
                                                   score=SCORE, 
                                                   scoreboard=TOURNAMENT_STANDINGS, 
@@ -62,7 +61,6 @@ def tournamenttv():
                                                   bracket_winner = bracket_winner)
 
 @tv.route('/tv/scoreboard')
-@tv.route('/tv/scoreboard.html')
 def scoreboard():
     return render_template('/scoreboard.html',
                             winners=Winners().sorted(),
