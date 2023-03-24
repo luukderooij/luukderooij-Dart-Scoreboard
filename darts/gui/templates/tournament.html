@@ -134,10 +134,18 @@
                 { title: "POOL", field: "pool", resizable: false },
                 { title: "WEDSTRIJD", field: "match_id", resizable: false },
                 { title: "BORD", field: "board", resizable: false },
-                { title: "SPELER 1", field: "player_1", resizable: false },
-                { title: "SCORE", field: "score_1", validator: "integer", editor: true, resizable: false },
-                { title: "SPELER 2", field: "player_2", resizable: false },
-                { title: "SCORE", field: "score_2", validator: "integer", editor: true, resizable: false },
+                { title: "SPELER 1", field: "player_1", resizable: false, formatter:function(cell, formatterParams){
+                    var value = cell.getValue();
+                    return "<span style='color:#3FB449; font-weight:bold;'>" + value + "</span>";}},
+                { title: "SCORE 1", field: "score_1", validator: "integer", editor: true, resizable: false, editorParams:{
+                selectContents:true,
+                }},
+                { title: "SCORE 2", field: "score_2", validator: "integer", editor: true, resizable: false, editorParams:{
+                selectContents:true,
+                }},
+                { title: "SPELER 2", field: "player_2", resizable: false , formatter:function(cell, formatterParams){
+                    var value = cell.getValue();
+                    return "<span style='color:#3FB449; font-weight:bold;'>" + value + "</span>";}},
                 { title: "SCHEIDSRECHTER", field: "referee", resizable: false },
             ],
         });
