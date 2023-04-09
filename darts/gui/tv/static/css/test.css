@@ -1,5 +1,39 @@
 
 body {
-	background: #080;
+	background: #000;
+	overflow: hidden; /* Hide scrollbars */
+}
 
+.container {
+	position: relative;
+	background-color: red;
+	width: 100%;
+
+	padding-top: 56.25%; /*16:9 Aspect Ratio*/
+}
+
+.item1 {
+	position: absolute;
+	background-color: yellow;
+	width: 35%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
+.item2 {
+	position: absolute;
+	background-color: seagreen;
+	width: 65%;
+	height: 100%;
+	top: 0;
+	right: 0;
+}
+
+.footer {
+	position: absolute;
+	background-color: gray;
+	width: 100%;
+	bottom: 0;
+	right: 0;
 }
