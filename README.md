@@ -10,7 +10,8 @@ Dart-Scoreboard
 - sudo chown root:root /etc/systemd/system/darts.service 
 - sudo chmod 644 /etc/systemd/system/darts.service
 
-- sudo apt install python3-pip sudo -u darts python3 -m pip install -r requirements.txt
+- sudo apt install python3-pip 
+- sudo -u darts python3 -m pip install -r requirements.txt
 
 - sudo systemctl enable darts
 - sudo systemctl start darts
