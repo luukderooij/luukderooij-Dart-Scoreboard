@@ -423,6 +423,9 @@ def uploadimage():
     tournament_id = str(Tournament().get_latest_tournament_id())
     path = os.path.join(os.getcwd(), "uploads")
 
+    print(f"Path = {path}")
+    print(f"Path = {settings.DATA_DIR}")
+
     files = []
     for i in os.listdir(path):
         if os.path.isfile(os.path.join(path,i)) and tournament_id in i:
