@@ -425,6 +425,7 @@ def uploadimage():
 
     print(f"Path = {path}")
     print(f"Path = {settings.DATA_DIR}")
+    #j
 
     files = []
     for i in os.listdir(path):
