@@ -421,7 +421,6 @@ def checkforwinner():
 @api.route('/api/upload/image/')
 def uploadimage():
     tournament_id = str(Tournament().get_latest_tournament_id())
-    path = "C:\\Users\\Luuk\\Documents\\GitHub\\Dart-Scoreboard\\uploads"
     path = os.path.join(os.getcwd(), "uploads")
 
     files = []
@@ -557,6 +556,8 @@ def gettournament():
     res = make_response(jsonify(matches), 200)
     res.headers.add('Access-Control-Allow-Origin','*')
     return res
+
+
 
 
 
