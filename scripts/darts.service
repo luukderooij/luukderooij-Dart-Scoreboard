@@ -4,8 +4,8 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-User=Darts
-Group=Darts
+User=darts
+Group=darts
 
 Type=simple
 ExecStart=/usr/bin/python3 /opt/darts/dartsscoreboard.py
