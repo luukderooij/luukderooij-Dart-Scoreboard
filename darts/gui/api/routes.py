@@ -418,25 +418,25 @@ def checkforwinner():
     return response
 
 
-# @api.route('/api/upload/image/')
-# def uploadimage():
-#     tournament_id = str(Tournament().get_latest_tournament_id())
-#     path = os.path.join(os.getcwd(), "uploads")
+@api.route('/api/upload/image/')
+def uploadimage():
+    tournament_id = str(Tournament().get_latest_tournament_id())
+    path = os.path.join(os.getcwd(), "uploads")
 
-#     print(f"Path = {path}")
-#     print(f"Path = {settings.DATA_DIR}")
-#     #j
+    print(f"Path = {path}")
+    print(f"Path = {settings.DATA_DIR}")
+    #j
 
-#     files = []
-#     for i in os.listdir(path):
-#         if os.path.isfile(os.path.join(path,i)) and tournament_id in i:
-#             files.append(i)
+    files = []
+    for i in os.listdir(path):
+        if os.path.isfile(os.path.join(path,i)) and tournament_id in i:
+            files.append(i)
 
 
-#     if files: 
-#         return send_from_directory(path, files[0], as_attachment=False)
-#     else:
-#         abort(404)
+    if files: 
+        return send_from_directory(path, files[0], as_attachment=False)
+    else:
+        abort(404)
 
 
 @api.route('/api/upload/file', methods=['POST'])
@@ -545,7 +545,22 @@ def menu():
     response = make_response(jsonify({"status": "true"}),200)
     return response
 
+@api.route('/api/log', methods=['GET','POST'])
+def log():
 
+    if request.method == 'POST':
+
+        jsonData = request.get_json()
+        print(jsonData)
+
+    with open(settings.LOG_FILE) as log:
+        logs = log.read().splitlines()
+    #limit loglines
+    logs = logs[-100:]
+    
+    logs.reverse()
+    response = make_response(jsonify({"log": logs}),200)
+    return response
 
 #####################################################################################
 # -----  api Marks tv site -----
