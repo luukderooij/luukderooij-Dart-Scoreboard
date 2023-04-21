@@ -3,6 +3,7 @@ import os
 
 import logging
 import datetime
+import subprocess
 
 from flask import Blueprint, render_template, Flask, redirect, request, render_template, send_file, session, jsonify, abort, make_response, flash, send_from_directory, send_file
 
@@ -518,6 +519,7 @@ def menu():
             elif button == 'marks_tournament':
                 try:
                     logger.info('Marks tournament openen!')
+    
                     os.environ['DISPLAY'] = ':0'
                     os.system("sudo -u pi chromium-browser -kiosk --app http:localhost:8080")
                 except:
@@ -527,8 +529,10 @@ def menu():
             elif button == 'tournament':
                 try:
                     logger.info('tournament openen!')
-                    os.environ['DISPLAY'] = ':0'
-                    os.system("sudo -u pi chromium-browser -kiosk --app http:localhost/tv/tournament")
+
+                    subprocess.call(['chromium-browser', '--kiosk', 'http://localhost/tv/tournament'])
+                    # os.environ['DISPLAY'] = ':0'
+                    # os.system("sudo -u pi chromium-browser -kiosk --app http:localhost/tv/tournament")
                 except:
                     print("os command niet gelukt")
 
