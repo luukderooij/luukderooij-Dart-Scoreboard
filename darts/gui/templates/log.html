@@ -1,53 +1,78 @@
-<html>
+{% include 'header.html' %}
 
-<body>
-    <h1>
-        LOG
-    </h1>
-    <p id="demo"></p>
-</body>
+        <div id="container-fluid">
 
-</html>
+            <h1>
+                LOG
+            </h1>
 
+            <div class="container text-center">
+                <div class="row row-cols-auto">
+                  <div class="col">
+                    <div>
+                        <label for="log-limit">Log Limit:</label>
+                        <select class="form-select" id="log-limit">
+                          <option value="100">10</option>
+                          <option value="100">100</option>
+                          <option value="500">500</option>
+                          <option value="1000">1000</option>
+                          <option value="5000">5000</option>
+                        </select>
+                      </div>
+                  </div>
+                  <div class="col">
+                    <button type="button" class="btn btn-primary" id="pause-button">Pause</button>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+            <div id="log-container"></div>
+
+        </div>
+
+{% include 'footer.html' %}
 
 
 <script>
-    // Example POST method implementation:
-    async function postData(url = '', data = {}) {
-        // Default options are marked with *
-        const response = await fetch(url, {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, *cors, same-origin
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: 'same-origin', // include, *same-origin, omit
-            headers: {
-                'Content-Type': 'application/json'
-                // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            redirect: 'follow', // manual, *follow, error
-            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            body: JSON.stringify(data) // body data type must match "Content-Type" header
+    let isPaused = false; // Global variable to track pause state
+    let logLimit = parseInt(document.getElementById('log-limit').value);
+    console.log(logLimit)
+
+    async function fetchLogData() {
+    if (!isPaused) { // Only fetch logs if not paused
+        const response = await fetch('/api/log');
+        if (response.ok) {
+        const data = await response.json();
+        console.log(data)
+        const logs = Object.values(data).slice(-logLimit);
+        console.log(logs)
+        const logLines = logs.map(items => {
+            return `<li>${items.join('</li><li>')}</li>`;
         });
-        return response.json(); // parses JSON response into native JavaScript objects
+        document.getElementById('log-container').innerHTML = logLines.join('');
+        } else {
+        console.error(`Failed to fetch log data: ${response.status}`);
+        }
+    }
     }
 
-    function updateLogData() {
-        postData('/api/get/log')
-            .then(data => {
-                console.log(data); // JSON data parsed by `data.json()` call
+    setInterval(fetchLogData, 5000); // Refresh logs every 5 seconds
+    fetchLogData(logLimit); // Load logs on page load
 
-                let log = "";
-                for (const [key, value] of Object.entries(data)) {
-                    console.log(key, value);
-                    log += value + "<br>";
-                }
+    const pauseButton = document.getElementById('pause-button');
+    pauseButton.addEventListener('click', () => {
+    isPaused = !isPaused;
+    pauseButton.textContent = isPaused ? 'Resume' : 'Pause';
+    });
 
-
-                document.getElementById("demo").innerHTML = log;
-
-            });
-        setTimeout(updateLogData, 500);
-    }
-    updateLogData();
+    const logLimitDropdown = document.getElementById('log-limit');
+    logLimitDropdown.addEventListener('change', () => {
+    logLimit = parseInt(logLimitDropdown.value);
+    fetchLogData();
+  });
 
 </script>
+
