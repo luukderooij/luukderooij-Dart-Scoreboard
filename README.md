@@ -15,6 +15,9 @@ Dart-Scoreboard
 
 - sudo apt-get install libatlas-base-dev
 
+# to allow port 80 as none root
+- sudo setcap 'cap_net_bind_service=+ep' /usr/bin/python3.9
+
 - sudo systemctl enable darts
 - sudo systemctl start darts
 - sudo systemctl status darts
