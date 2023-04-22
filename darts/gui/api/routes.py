@@ -529,9 +529,12 @@ def menu():
             elif button == 'tournament':
                 try:
                     logger.info('tournament openen!')
+                    subprocess.call(['xset', '-dpms'])
+                    subprocess.call(['xset', 's', 'off'])
+                    subprocess.call(['xset', 's', 'noblank'])
                     print(os.environ.get('DISPLAY'))
                     os.environ['DISPLAY'] = ':0'
-                    subprocess.call(['chromium-browser', '--kiosk', 'http://localhost/tv/tournament'])
+                    subprocess.Popen(['chromium-browser', '--kiosk', 'http://localhost/tv/tournament'])
                     # os.environ['DISPLAY'] = ':0'
                     # os.system("sudo -u pi chromium-browser -kiosk --app http:localhost/tv/tournament")
                 except:
