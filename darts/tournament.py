@@ -316,6 +316,15 @@ class Tournament:
         with dartDB(settings.DB_FILE) as db:
             data = db.fetchall(sql_, par_)
         return data
+    
+    # Get all tournaments.
+    def fetchall(self):
+        sql_ = f"SELECT * FROM {self.table}"
+        par_ = {}    
+        with dartDB(settings.DB_FILE) as db:
+            data = db.fetchall(sql_, par_)
+
+        return data
 
     # Get tournament matches data
     def get_tournament_matches_data(self, tournament_id, pool=None):
