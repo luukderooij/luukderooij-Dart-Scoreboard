@@ -597,14 +597,8 @@ def getalltournaments():
 
 @api.route('/api/get/tournament/', methods=['GET','POST'])
 def gettournament():
-    if request.method == 'POST':
-        pass
     tournament_id = request.args.get('id')
-    print(tournament_id)
 
-
-    pid = request.args.get('pouleid')
-    tid = None
     if tournament_id == None:
         tournament_id = Tournament().get_latest_tournament_id()
 
