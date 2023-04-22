@@ -530,6 +530,8 @@ def menu():
                 try:
                     logger.info('tournament openen!')
                     os.environ['DISPLAY'] = ':0'
+                    print('DISPAY PRINT NU')
+                    print(os.environ.get('DISPLAY'))
                     
                     subprocess.call(['xset', '-dpms'])
                     subprocess.call(['xset', 's', 'off'])
