@@ -422,20 +422,20 @@ def checkforwinner():
 @api.route('/api/upload/image/')
 def uploadimage():
     tournament_id = str(Tournament().get_latest_tournament_id())
-    path = os.path.join(os.getcwd(), "uploads")
+ 
 
-    print(f"Path = {path}")
-    print(f"Path = {settings.DATA_DIR}")
-    #j
+    folder = 'uploads'
+    upload_folder = os.path.join(settings.DATA_DIR, folder)
+
 
     files = []
-    for i in os.listdir(path):
-        if os.path.isfile(os.path.join(path,i)) and tournament_id in i:
+    for i in os.listdir(upload_folder):
+        if os.path.isfile(os.path.join(upload_folder,i)) and tournament_id in i:
             files.append(i)
 
 
     if files: 
-        return send_from_directory(path, files[0], as_attachment=False)
+        return send_from_directory(upload_folder, files[0], as_attachment=False)
     else:
         abort(404)
 
