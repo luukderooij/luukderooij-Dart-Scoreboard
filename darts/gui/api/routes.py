@@ -582,25 +582,51 @@ def log():
 # -----  api Marks tv site -----
 #####################################################################################
 
+@api.route('/api/get/tournaments/')
+def getalltournaments():
+    tournaments_data = Tournament().fetchall()
+    tournaments = []
 
+    for tournament in tournaments_data:
+        tournament_dict = {"id": tournament[0],
+                           "name": tournament[1],
+                           "date": tournament[5]}
+        tournaments.append(tournament_dict)
+                               
+    tournaments = {"tournaments": tournaments}
+     
+    res = make_response(jsonify(tournaments), 200)
+    res.headers.add('Access-Control-Allow-Origin','*')
+    return res
 
 @api.route('/api/get/tournament/', methods=['GET','POST'])
 def gettournament():
-    if request.method == 'POST':
-        pass
-    tid = request.args.get('tournamentid')
-    pid = request.args.get('pouleid')
+    tournament_id = request.args.get('id')
 
-    if tid == None:
-        tid = Tournament().get_latest_tournament_id()
+    if tournament_id == None:
+        tournament_id = Tournament().get_latest_tournament_id()
 
-    matches=Tournament().api_get_tournament(tid)
+    matches=Tournament().api_get_tournament(tournament_id)
 
     res = make_response(jsonify(matches), 200)
     res.headers.add('Access-Control-Allow-Origin','*')
     return res
 
+# @api.route('/api/get/playoffs', methods=['GET','POST'])
+# def getplayoffs():
+#     if request.method == 'POST':
+#         pass
+#     tid = request.args.get('tournamentid')
+#     pid = request.args.get('pouleid')
 
+#     if tid == None:
+#         tid = Tournament().get_latest_tournament_id()
+
+#     matches=Tournament().api_get_tournament(tid)
+
+#     res = make_response(jsonify(matches), 200)
+#     res.headers.add('Access-Control-Allow-Origin','*')
+#     return res
 
 
 
