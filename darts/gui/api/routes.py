@@ -462,9 +462,7 @@ def uploadfile():
 
         print(f"Path = {settings.DATA_DIR}")
 
-        #file.save(os.path.join(".\\uploads\\", filename))
-        print(os.path.join(os.getcwd(), "uploads", filename))
-        file.save(os.path.join(os.getcwd(), "uploads", filename))
+        file.save(os.path.join(os.getcwd(), upload_folder, filename))
    
     response = make_response('Response')
     return response
