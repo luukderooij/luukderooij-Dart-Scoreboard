@@ -529,18 +529,15 @@ def menu():
             elif button == 'tournament':
                 try:
                     logger.info('tournament openen!')
+
                     os.environ['DISPLAY'] = ':0'
-                    print('DISPAY PRINT NU')
                     print(os.environ.get('DISPLAY'))
                     
                     subprocess.call(['xset', '-dpms'])
                     subprocess.call(['xset', 's', 'off'])
                     subprocess.call(['xset', 's', 'noblank'])
-                    print(os.environ.get('DISPLAY'))
                     
                     subprocess.Popen(['chromium-browser', '--kiosk', 'http://localhost/tv/tournament'])
-                    # os.environ['DISPLAY'] = ':0'
-                    # os.system("sudo -u pi chromium-browser -kiosk --app http:localhost/tv/tournament")
                 except:
                     print("os command niet gelukt")
 
@@ -548,8 +545,15 @@ def menu():
             elif button == 'scoreboard':
                 try:
                     logger.info('scoreboard openen!')
+
                     os.environ['DISPLAY'] = ':0'
-                    os.system("sudo -u pi chromium-browser -kiosk --app http:localhost/tv/scoreboard")
+                    print(os.environ.get('DISPLAY'))
+                    
+                    subprocess.call(['xset', '-dpms'])
+                    subprocess.call(['xset', 's', 'off'])
+                    subprocess.call(['xset', 's', 'noblank'])
+                    
+                    subprocess.Popen(['chromium-browser', '--kiosk', 'http:localhost/tv/scoreboard'])
                 except:
                     print("os command niet gelukt")
 
