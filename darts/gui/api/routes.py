@@ -454,7 +454,9 @@ def uploadfile():
         print(filename)
 
         folder = 'uploads'
-        if not os.path.exists(os.path.join(settings.DATA_DIR, folder)):
+        upload_folder = os.path.join(settings.DATA_DIR, folder)
+        logger.info(f'Uploadfolder: {upload_folder}')
+        if not os.path.exists(upload_folder):
             logger.info(f'Creating folder uploads!')
             os.makedirs(os.path.join(settings.DATA_DIR, folder))
 
