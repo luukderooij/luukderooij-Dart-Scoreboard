@@ -21,3 +21,9 @@ Dart-Scoreboard
 - sudo systemctl enable darts
 - sudo systemctl start darts
 - sudo systemctl status darts
+
+
+sudo apt install nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
