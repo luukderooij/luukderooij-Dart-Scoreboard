@@ -3,6 +3,7 @@ import os
 
 import logging
 import datetime
+import subprocess
 
 from flask import Blueprint, render_template, Flask, redirect, request, render_template, send_file, session, jsonify, abort, make_response, flash, send_from_directory, send_file
 
@@ -421,16 +422,20 @@ def checkforwinner():
 @api.route('/api/upload/image/')
 def uploadimage():
     tournament_id = str(Tournament().get_latest_tournament_id())
-    path = os.path.join(os.getcwd(), "uploads")
+ 
+
+    folder = 'uploads'
+    upload_folder = os.path.join(settings.DATA_DIR, folder)
+
 
     files = []
-    for i in os.listdir(path):
-        if os.path.isfile(os.path.join(path,i)) and tournament_id in i:
+    for i in os.listdir(upload_folder):
+        if os.path.isfile(os.path.join(upload_folder,i)) and tournament_id in i:
             files.append(i)
 
 
     if files: 
-        return send_from_directory(path, files[0], as_attachment=False)
+        return send_from_directory(upload_folder, files[0], as_attachment=False)
     else:
         abort(404)
 
@@ -447,9 +452,17 @@ def uploadfile():
         filename_old, file_extension = os.path.splitext(filename)
         filename = os.path.join(tournament_id + file_extension)
         print(filename)
-        #file.save(os.path.join(".\\uploads\\", filename))
-        print(os.path.join(os.getcwd(), "uploads", filename))
-        file.save(os.path.join(os.getcwd(), "uploads", filename))
+
+        folder = 'uploads'
+        upload_folder = os.path.join(settings.DATA_DIR, folder)
+        logger.info(f'Uploadfolder: {upload_folder}')
+        if not os.path.exists(upload_folder):
+            logger.info(f'Creating folder uploads!')
+            os.makedirs(os.path.join(settings.DATA_DIR, folder))
+
+        print(f"Path = {settings.DATA_DIR}")
+
+        file.save(os.path.join(upload_folder, filename))
    
     response = make_response('Response')
     return response
@@ -507,7 +520,13 @@ def menu():
                 try:
                     logger.info('Marks tournament openen!')
                     os.environ['DISPLAY'] = ':0'
-                    os.system("sudo -u pi chromium-browser -kiosk --app http:localhost:8080")
+                    print(os.environ.get('DISPLAY'))
+                    
+                    subprocess.call(['xset', '-dpms'])
+                    subprocess.call(['xset', 's', 'off'])
+                    subprocess.call(['xset', 's', 'noblank'])
+                    
+                    subprocess.Popen(['chromium-browser', '--kiosk', 'http:localhost:8080'])    
                 except:
                     print("os command niet gelukt")
 
@@ -515,8 +534,15 @@ def menu():
             elif button == 'tournament':
                 try:
                     logger.info('tournament openen!')
+
                     os.environ['DISPLAY'] = ':0'
-                    os.system("sudo -u pi chromium-browser -kiosk --app http:localhost/tv/tournament")
+                    print(os.environ.get('DISPLAY'))
+                    
+                    subprocess.call(['xset', '-dpms'])
+                    subprocess.call(['xset', 's', 'off'])
+                    subprocess.call(['xset', 's', 'noblank'])
+                    
+                    subprocess.Popen(['chromium-browser', '--kiosk', 'http://localhost/tv/tournament'])
                 except:
                     print("os command niet gelukt")
 
@@ -524,8 +550,15 @@ def menu():
             elif button == 'scoreboard':
                 try:
                     logger.info('scoreboard openen!')
+
                     os.environ['DISPLAY'] = ':0'
-                    os.system("sudo -u pi chromium-browser -kiosk --app http:localhost/tv/scoreboard")
+                    print(os.environ.get('DISPLAY'))
+                    
+                    subprocess.call(['xset', '-dpms'])
+                    subprocess.call(['xset', 's', 'off'])
+                    subprocess.call(['xset', 's', 'noblank'])
+                    
+                    subprocess.Popen(['chromium-browser', '--kiosk', 'http:localhost/tv/scoreboard'])
                 except:
                     print("os command niet gelukt")
 
@@ -533,31 +566,72 @@ def menu():
     response = make_response(jsonify({"status": "true"}),200)
     return response
 
+@api.route('/api/log', methods=['GET','POST'])
+def log():
 
+    if request.method == 'POST':
+
+        jsonData = request.get_json()
+        print(jsonData)
+
+    with open(settings.LOG_FILE) as log:
+        logs = log.read().splitlines()
+    #limit loglines
+    logs = logs[-100:]
+    
+    logs.reverse()
+    response = make_response(jsonify({"log": logs}),200)
+    return response
 
 #####################################################################################
 # -----  api Marks tv site -----
 #####################################################################################
 
+@api.route('/api/get/tournaments/')
+def getalltournaments():
+    tournaments_data = Tournament().fetchall()
+    tournaments = []
 
+    for tournament in tournaments_data:
+        tournament_dict = {"id": tournament[0],
+                           "name": tournament[1],
+                           "date": tournament[5]}
+        tournaments.append(tournament_dict)
+                               
+    tournaments = {"tournaments": tournaments}
+     
+    res = make_response(jsonify(tournaments), 200)
+    res.headers.add('Access-Control-Allow-Origin','*')
+    return res
 
 @api.route('/api/get/tournament/', methods=['GET','POST'])
 def gettournament():
-    if request.method == 'POST':
-        pass
-    tid = request.args.get('tournamentid')
-    pid = request.args.get('pouleid')
+    tournament_id = request.args.get('id')
 
-    if tid == None:
-        tid = Tournament().get_latest_tournament_id()
+    if tournament_id == None:
+        tournament_id = Tournament().get_latest_tournament_id()
 
-    matches=Tournament().api_get_tournament(tid)
+    matches=Tournament().api_get_tournament(tournament_id)
 
     res = make_response(jsonify(matches), 200)
     res.headers.add('Access-Control-Allow-Origin','*')
     return res
 
+# @api.route('/api/get/playoffs', methods=['GET','POST'])
+# def getplayoffs():
+#     if request.method == 'POST':
+#         pass
+#     tid = request.args.get('tournamentid')
+#     pid = request.args.get('pouleid')
 
+#     if tid == None:
+#         tid = Tournament().get_latest_tournament_id()
+
+#     matches=Tournament().api_get_tournament(tid)
+
+#     res = make_response(jsonify(matches), 200)
+#     res.headers.add('Access-Control-Allow-Origin','*')
+#     return res
 
 
 

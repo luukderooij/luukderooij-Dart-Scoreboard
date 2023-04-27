@@ -29,7 +29,7 @@
     
             <div class="container-fluid">
     
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="/">
     
                     <img src="{{ url_for('static', filename='img/logo-alt.png') }}" alt="Logo" width="29" height="29"
                         class="d-inline-block align-text-top">
@@ -121,7 +121,15 @@
                                 </li>
                                 <li><a class="dropdown-item" onclick="menu('marks_tournament');return false;">Mark
                                         Tournament</a></li>
+                                
+                                <li>
+
+                                    <hr class="dropdown-divider">
     
+                                </li>
+        
+                                <li><a class="dropdown-item" href="/log">Log</a></li>
+                                
                                 <li>
     
                                     <hr class="dropdown-divider">

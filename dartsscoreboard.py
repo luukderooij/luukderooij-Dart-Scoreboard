@@ -9,6 +9,10 @@ from darts.gui import app
 from darts.dartdb import dartDB
 
 
+__version__ = "1.0.0"
+__date__ = "27-04-2023"
+
+
 class Darts:
     def __init__(self):
         pass
@@ -18,7 +22,7 @@ class Darts:
         print(f"Path installation directory:: {settings.DATA_DIR}")
 
         settings.CONFIG_FILE = os.path.join(settings.DATA_DIR, "config.ini")
-        print(f"Path config.ini: {settings.CONFIG_FILE}")
+        print(f"Path confg.ini: {settings.CONFIG_FILE}")
 
         Configuration(settings.CONFIG_FILE).initialize()
 

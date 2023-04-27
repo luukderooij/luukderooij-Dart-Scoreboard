@@ -33,7 +33,7 @@ class Tournament:
             raise ValueError(f'Too many players ({number_of_players}) for {self.pools} poule(s)! Use max 7 players per poule.')
 
         # Create tournament and add too database.
-        self.create_tournament()
+        self.add_tournament_to_db()
 
         # Shuffle players list
         random.shuffle(self.players)
@@ -69,7 +69,7 @@ class Tournament:
                         
             self.create_matches(player_pool_list)
 
-    def create_tournament(self):
+    def add_tournament_to_db(self):
         date_time = datetime.datetime.now()
         sql_ = f"INSERT INTO tournament VALUES (NULL, :tournament_name, :number_of_pools, :playoffs_rounds, :boards, :date)"
         par_ = {"tournament_name": self.name,
@@ -315,6 +315,15 @@ class Tournament:
         par_ = {"id": tournament_id}
         with dartDB(settings.DB_FILE) as db:
             data = db.fetchall(sql_, par_)
+        return data
+    
+    # Get all tournaments.
+    def fetchall(self):
+        sql_ = f"SELECT * FROM {self.table}"
+        par_ = {}    
+        with dartDB(settings.DB_FILE) as db:
+            data = db.fetchall(sql_, par_)
+
         return data
 
     # Get tournament matches data
