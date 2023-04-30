@@ -16,18 +16,22 @@ class Players:
         with dartDB(settings.DB_FILE) as db:
             data = db.fetchall(sql_, par_)
 
-        players = []
-        for player in data:
-            dictionary = {"id": int(player[0]),
-                        "firstname": str(player[1]),
-                        "lastname": str(player[2]),
-                        "nickname": str(player[3]),
-                        "arcadename": str(player[4]),
-                        "email": str(player[5]),
-                        "date_joined": str(player[6])}
-            players.append(dictionary)
+        if data:
+            players = []
+            for player in data:
+                dictionary = {"id": int(player[0]),
+                            "firstname": str(player[1]),
+                            "lastname": str(player[2]),
+                            "nickname": str(player[3]),
+                            "arcadename": str(player[4]),
+                            "email": str(player[5]),
+                            "date_joined": str(player[6])}
+                players.append(dictionary)
 
-        return players
+            return players
+        else:
+            logger.error(f"No players found in database!")
+            return None
 
     def fetchone(self, id):
         sql_ = f"SELECT * FROM {self.table} WHERE id = :id"
@@ -35,15 +39,19 @@ class Players:
         with dartDB(settings.DB_FILE) as db:           
             data = db.fetchone(sql_, par_)
 
-        player = {"id": int(data[0]),
-                    "firstname": str(data[1]),
-                    "lastname": str(data[2]),
-                    "nickname": str(data[3]),
-                    "arcadename": str(data[4]),
-                    "email": str(data[5]),
-                    "date_joined": str(data[6])}
+        if data:
+            player = {"id": int(data[0]),
+                        "firstname": str(data[1]),
+                        "lastname": str(data[2]),
+                        "nickname": str(data[3]),
+                        "arcadename": str(data[4]),
+                        "email": str(data[5]),
+                        "date_joined": str(data[6])}
 
-        return player
+            return player
+        else:
+            logger.error(f"No player with id: {id} found in database!")
+            return None
 
     def add(self, firstname, lastname, nickname, arcadename, email):
         sql_ = f"""INSERT INTO {self.table} VALUES (NULL, :firstname, 
@@ -69,7 +77,7 @@ class Players:
             "arcadename": arcadename,
             "email": email}
         with dartDB(settings.DB_FILE) as db:
-            db.execute(sql_, par_)
+            print(db.execute(sql_, par_))
         
     def remove(self, id):
         sql_ = f"DELETE FROM {self.table} WHERE id = :id"

@@ -9,8 +9,8 @@ from darts.gui import app
 from darts.dartdb import dartDB
 
 
-__version__ = "1.0.0"
-__date__ = "27-04-2023"
+__version__ = "1.0.2"
+__date__ = "30-04-2023"
 
 
 class Darts:
