@@ -27,3 +27,4 @@ sudo apt install nginx
 sudo systemctl start nginx
 sudo systemctl enable nginx
 
+sudo nano /etc/nginx/sites-enabled/default

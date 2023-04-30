@@ -617,21 +617,7 @@ def gettournament():
     res.headers.add('Access-Control-Allow-Origin','*')
     return res
 
-# @api.route('/api/get/playoffs', methods=['GET','POST'])
-# def getplayoffs():
-#     if request.method == 'POST':
-#         pass
-#     tid = request.args.get('tournamentid')
-#     pid = request.args.get('pouleid')
 
-#     if tid == None:
-#         tid = Tournament().get_latest_tournament_id()
-
-#     matches=Tournament().api_get_tournament(tid)
-
-#     res = make_response(jsonify(matches), 200)
-#     res.headers.add('Access-Control-Allow-Origin','*')
-#     return res
 
 
 
