@@ -10,22 +10,163 @@
 
     </head>
 
-    <body>
 
-        <div class="container">
+   <body>
 
-            <div class="wrapper">
+        <div class="grid-container">
 
-                <div class="item1">bla</div>
+            <div class="header">
 
-                <div class="item2">bla</div>
+                <div class="header-logo">
 
-                <div class="footer">hfghfhghfh</div>
+                    <img src="{{ url_for('static', filename='img/logo-alt.png') }}" class="logo"></img>
 
-            </div>          
+                    <h1>Dubbel<span>1</span></h1>
+           
+                </div>
+                
+            </div>
+
+            <div class="info">
+
+                <div class="info_wrapper">
+                
+                    <h1>Winnaar</h1>
+                    <p id="datum"></p>
+                    <h2 id="winner"></h2>
+
+                </div>
+            
+            </div>
+
+            <div class="image">
+                
+                <img id='image' src="https://www.pngmart.com/files/12/Bob-Minion-PNG-Image.png" alt="Image description">
+
+            </div>
+
+            <div class="footer">
+
+                <div class="wrapper">
+
+                    <span>Luuk Pro & Harborman © 2023</span>
+
+                </div>
+            
+            </div>
 
         </div>
 
     </body>
 
 </html>
+
+
+<script>
+	async function GetURL(url) {
+		const response = await fetch(url);
+		if (response.status === 200) {
+			show_image()
+			return response;
+		}
+	}
+
+	function show_image() {
+        let imageElement = document.getElementById('image'); // assuming you have an <img> element with id="image"
+        let imageUrl = '/api/upload/image/'; // replace with the URL of your image
+        imageElement.setAttribute('src', imageUrl);
+	}
+
+
+	document.addEventListener("DOMContentLoaded", function () {
+		let url = '/api/upload/image/'
+		let jsonData = GetURL(url)
+
+	});
+
+
+
+
+    async function GetData(url, data) {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+
+        // Error
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        let jsonData = await response.json();
+        return jsonData;
+    }
+
+   
+    async function Tournamentinfo() {
+        let url = '/api/get/tournamentinfo/'
+        let tournament_id = { tournament_id: '0' }
+        let jsonData = await GetData(url, tournament_id)
+        console.log(jsonData)
+        console.log(jsonData[0][6])
+
+        let datetimeString = jsonData[0][6]
+        const datetime = new Date(datetimeString);
+
+        const year = datetime.getFullYear();
+        const month = datetime.getMonth() + 1;
+        const day = datetime.getDate();
+        const hours = datetime.getHours();
+        const minutes = datetime.getMinutes();
+        const seconds = datetime.getSeconds();
+        const milliseconds = datetime.getMilliseconds();
+
+        const months = ['januari', 'februari ', 'maart', 'april', 'mei', 'June', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+        const monthName = months[datetime.getMonth()];
+
+        console.log(`${day}-${monthName}-${year}`);
+
+        const datum = document.getElementById("datum");
+        const myText = document.createTextNode(`${day} ${monthName} ${year}`);
+        datum.appendChild(myText);
+
+    }
+
+    async function Winner() {
+        let url = '/api/get/winner/'
+        let tournament_id = { tournament_id: '0' }
+        let jsonData = await GetData(url, tournament_id)
+        console.log(jsonData)
+        const winner = document.getElementById("winner");
+        const myText = document.createTextNode(jsonData);
+        winner.appendChild(myText);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        Tournamentinfo()
+        Winner()
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

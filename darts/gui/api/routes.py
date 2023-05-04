@@ -547,6 +547,23 @@ def menu():
                     print("os command niet gelukt")
 
 
+            elif button == 'test':
+                try:
+                    logger.info('test openen!')
+
+                    os.environ['DISPLAY'] = ':0'
+                    print(os.environ.get('DISPLAY'))
+                    
+                    subprocess.call(['xset', '-dpms'])
+                    subprocess.call(['xset', 's', 'off'])
+                    subprocess.call(['xset', 's', 'noblank'])
+                    
+                    subprocess.Popen(['chromium-browser', '--kiosk', 'http://localhost/tv/test'])
+                except:
+                    print("os command niet gelukt")
+
+
+
             elif button == 'scoreboard':
                 try:
                     logger.info('scoreboard openen!')
@@ -618,6 +635,37 @@ def gettournament():
     return res
 
 
+@api.route('/api/get/winner/', methods=['GET','POST'])
+def getwinner():
+    tournament_id = request.args.get('id')
 
+    if tournament_id == None:
+        tournament_id = Tournament().get_latest_tournament_id()
 
+    try:
+        bracket_winner = Playoffs().winner_bracket(tournament_id)
+    except:
+        bracket_winner = None
+        logger.info("Something went wrong in winner_bracket.")  
+
+    res = make_response(jsonify(bracket_winner), 200)
+    res.headers.add('Access-Control-Allow-Origin','*')
+    return res
+
+@api.route('/api/get/tournamentinfo/', methods=['GET','POST'])
+def tournamentinfo():
+    tournament_id = request.args.get('id')
+
+    if tournament_id == None:
+        tournament_id = Tournament().get_latest_tournament_id()
+
+    try:
+        tournament_info = Tournament().get_tournament_info_data(tournament_id)
+    except:
+        tournament_info = None
+        logger.info("Something went wrong in winner_bracket.")  
+
+    res = make_response(jsonify(tournament_info), 200)
+    res.headers.add('Access-Control-Allow-Origin','*')
+    return res
 
