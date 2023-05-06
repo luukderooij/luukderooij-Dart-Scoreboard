@@ -142,9 +142,13 @@
                 { title: "WEDSTRIJD", field: "match_id", resizable: false },
                 { title: "BORD", field: "board", resizable: false },
                 { title: "SPELER 1", field: "player_1", resizable: false },
-                { title: "SCORE", field: "score_1", validator: "integer", editor: true, resizable: false },
+                { title: "SCORE", field: "score_1", validator: "integer", editor: true, resizable: false, editorParams:{
+                selectContents:true,
+                }},
                 { title: "SPELER 2", field: "player_2", resizable: false },
-                { title: "SCORE", field: "score_2", validator: "integer", editor: true, resizable: false },
+                { title: "SCORE", field: "score_2", validator: "integer", editor: true, resizable: false, editorParams:{
+                selectContents:true,
+                }},
                 { title: "SCHEIDSRECHTER", field: "referee", resizable: false },
                 {
                     title: "Del", field: "date", resizable: true, width: 100,
