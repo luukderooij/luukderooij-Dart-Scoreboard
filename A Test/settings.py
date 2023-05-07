@@ -1,0 +1,7 @@
+CONFIG_FILE = None
+DATA_DIR = None
+DB_FILE = None
+LOG_FILE = None
+WEB_HOST = None
+WEB_PORT = None
+DEVELOPMENT = None
