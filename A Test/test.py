@@ -131,7 +131,7 @@ class Tournament:
 
     def create_matches(self):
         # Random list.
-        all_players = players.copy()
+        all_players = self.players.copy()
         random.shuffle(all_players)
 
         # Number of players.
@@ -143,75 +143,97 @@ class Tournament:
         elif number_of_players // self.number_of_pools > 7:
             raise ValueError("Too many players!")
         
-        
         print(f'number_of_players {number_of_players}')
         print(f'number of pools: {self.number_of_pools}')
-        print(number_of_players // self.number_of_pools)
-        print(number_of_players % 2)
+        print(f'all players {all_players}')
 
-        num_pools = self.number_of_pools
 
-        pool_sizes = [len(all_players) // num_pools] * num_pools
-        remainder = len(all_players) % num_pools
+        # Divide players over the pools.
+        pool_sizes = [len(all_players) // self.number_of_pools] * self.number_of_pools
+        remainder = len(all_players) % self.number_of_pools
         for i in range(remainder):
             pool_sizes[i] += 1
-        
         pools = []
         start = 0
         for size in pool_sizes:
             pools.append(all_players[start:start+size])
-            start += size
+            start += size    
+        pool_number = 1
 
-        print('hier')
-   
+        self.matches = []
+        self.match_number = 1
 
-        for pool in pools:
-            print(pool)
-
-
-
-
-
-
-
-
-
-
-        # Caculate max players per pool.
-        num_players_per_pool = number_of_players // self.number_of_pools
-        print(num_players_per_pool)
-
-        # Create roundrobin for every pool.
-        for pool in range(self.number_of_pools):
-            pool_num = pool + 1
-
-            round 
-
-
-
-
-
-
-
-    def create_round_robin(self):
-        # Number of players
-        number_of_players = len(self.players)
+        # Create mathes for every pool.
+        for pool_players in pools:
+            self.create_round_robin(pool_players, pool_number)
+            pool_number += 1
 
         
+        print(self.matches)
+
+            
+
+    def create_round_robin(self, pool_players, pool_number):
+        # Number of players
+        number_of_players = len(pool_players)
+
         # Check if there can be played om multiple boards.        
         if number_of_players < 6 and self.number_of_boards > 1:
             raise ValueError(f"Too many boards selected for {number_of_players} players! 6 Players needed for 2 boards.")
 
+        # Create round-robin top side list.
+        top_players = pool_players[:len(pool_players)//2]
+
+        # Create round-robin bottom side list.
+        bottom_players = pool_players[len(pool_players)//2:]
+        bottom_players.reverse()
+
+        # Fill empty spot 
+        if len(top_players) < len(bottom_players):
+            top_players.append({'player_id': 'EMPTY'})
+        elif len(top_players) > len(bottom_players):
+            bottom_players.append({'player_id': 'EMPTY'})
+
+        # Calculate number of matches there need to be played.
+        number_of_matches = len(pool_players) * (len(pool_players) - 1) // 2
+    
+        for match in range(number_of_matches):
+
+            for top_player in top_players:
+                bottom_player = bottom_players[top_players.index(top_player)]
+
+                if top_player['player_id'] != "EMPTY" and bottom_player['player_id'] != "EMPTY":    
+
+                    # Random the first and second player!
+                    list = [top_player, bottom_player]
+                    random.shuffle(list)
+                    top_player = list[0]
+                    bottom_player = list[1]
+
+                    dict = {
+                        "pool": pool_number,
+                        "match": self.match_number,
+                        "player1": top_player['player_id'],
+                        "player2": bottom_player['player_id']
+                    }
+                    self.match_number += 1
+
+                    self.matches.append(dict)
+
+            # Rotate players in round-robin.
+            top_players.insert(1, bottom_players[0])
+            bottom_players.append(top_players[-1])
+            top_players.pop()
+            bottom_players.pop(0)
+
+                
+        
 
 
 
 
 
 
-
-
-        # # Create round-robin top side list.
-        # top_players = players[:len(players)//2]
 
         # # Add emty spot by odd players.
         # if (number_of_players % 2) != 0:
@@ -283,37 +305,48 @@ class Tournament:
 
 
 
-players = [
-    {"player_id": 1, "first_name": "Bob", "last_name": "Smith", "nickname": "Bobby"},
-    {"player_id": 2, "first_name": "Isabella", "last_name": "Brown", "nickname": "Izzy"},
-    {"player_id": 3, "first_name": "David", "last_name": "Anderson", "nickname": "Davey"},
-    {"player_id": 4, "first_name": "Charlie", "last_name": "Davis", "nickname": "Chuck"},
-    {"player_id": 5, "first_name": "Frank", "last_name": "Lee", "nickname": "Frankie"},
-    {"player_id": 6, "first_name": "Grace", "last_name": "Wilson", "nickname": "Gracie"},
-    {"player_id": 7, "first_name": "Henry", "last_name": "Garcia", "nickname": "Hank"},
-    {"player_id": 8, "first_name": "Jack", "last_name": "Johnson", "nickname": "JJ"},
-    {"player_id": 9, "first_name": "Alice", "last_name": "Martin", "nickname": "Ally"},
-    {"player_id": 10, "first_name": "Emily", "last_name": "Taylor", "nickname": "Em"}
-    ]
+players = [    
+    {"player_id": 1, "first_name": "Mia", "last_name": "Garcia", "nickname": "MGar"}, 
+    {"player_id": 2, "first_name": "Benjamin", "last_name": "Jones", "nickname": "BJon"},
+    {"player_id": 3, "first_name": "Evelyn", "last_name": "Moore", "nickname": "EMoo"},    
+    {"player_id": 4, "first_name": "James", "last_name": "Rodriguez", "nickname": "JRod"},    
+    {"player_id": 5, "first_name": "Isabella", "last_name": "Scott", "nickname": "ISco"},    
+    {"player_id": 6, "first_name": "Grace", "last_name": "Anderson", "nickname": "GAnd"},    
+    {"player_id": 7, "first_name": "Sophia", "last_name": "White", "nickname": "SWhi"},    
+    {"player_id": 8, "first_name": "Oliver", "last_name": "Wilson", "nickname": "OWil"},    
+    {"player_id": 9, "first_name": "Alice", "last_name": "Lopez", "nickname": "ALop"},    
+    {"player_id": 10, "first_name": "David", "last_name": "Taylor", "nickname": "DTay"},    
+    {"player_id": 11, "first_name": "Frank", "last_name": "Davis", "nickname": "FDav"},    
+    {"player_id": 12, "first_name": "Charlie", "last_name": "Miller", "nickname": "CMil"},    
+    {"player_id": 13, "first_name": "Ava", "last_name": "Johnson", "nickname": "AJoh"},    
+    {"player_id": 14, "first_name": "William", "last_name": "Hernandez", "nickname": "WHer"},    
+    {"player_id": 15, "first_name": "Jack", "last_name": "Martin", "nickname": "JMar"},    
+    {"player_id": 16, "first_name": "Emily", "last_name": "Smith", "nickname": "ESmi"},    
+    {"player_id": 17, "first_name": "Noah", "last_name": "Jackson", "nickname": "NJac"},    
+    {"player_id": 18, "first_name": "Bob", "last_name": "Lee", "nickname": "BLee"},    
+    {"player_id": 19, "first_name": "Henry", "last_name": "Gonzalez", "nickname": "HGon"},    
+    {"player_id": 20, "first_name": "Emma", "last_name": "Brown", "nickname": "EBro"}
+]
 
-# players = [
-#     {"player_id": 1, "first_name": "Bob", "last_name": "Smith", "nickname": "Bobby"},
-#     {"player_id": 2, "first_name": "Isabella", "last_name": "Brown", "nickname": "Izzy"},
-#     {"player_id": 3, "first_name": "David", "last_name": "Anderson", "nickname": "Davey"},
-#     {"player_id": 4, "first_name": "Charlie", "last_name": "Davis", "nickname": "Chuck"},
-#     {"player_id": 5, "first_name": "Frank", "last_name": "Lee", "nickname": "Frankie"},
-#     {"player_id": 7, "first_name": "Henry", "last_name": "Garcia", "nickname": "Hank"},
-#     {"player_id": 8, "first_name": "Jack", "last_name": "Johnson", "nickname": "JJ"},
-#     {"player_id": 6, "first_name": "Grace", "last_name": "Wilson", "nickname": "Gracie"}
 
-#     ]
+number_of_players = 7
+number_of_pools = 3
+number_of_boards = 1
 
-tournament = Tournament(None, 'Een toernooitje', 1, 2, players)
+new_players = players[:number_of_players]
+
+for a in new_players:
+    print(a)
+
+
+
+
+tournament = Tournament(None, 'Een toernooitje', number_of_pools, number_of_boards, new_players)
 
 try:
     tournament.create_tournament()
     tournament.create_matches()
-    tournament.add_tournament_players()
+    # tournament.add_tournament_players()
 
 except Exception as e:
     print('error')
@@ -487,4 +520,20 @@ for r, matches in enumerate(schedule):
 
 1
 
-'''
+
+
+
+'''   
+
+# pool_sizes = [len(all_players) // num_pools] * num_pools
+#         print(f'pool_size: {pool_sizes}')
+#         remainder = len(all_players) % num_pools
+#         print(f'remainder: {remainder}')
+#         for i in range(remainder):
+#             pool_sizes[i] += 1
+        
+#         pools = []
+#         start = 0
+#         for size in pool_sizes:
+#             pools.append(all_players[start:start+size])
+#             start += size
