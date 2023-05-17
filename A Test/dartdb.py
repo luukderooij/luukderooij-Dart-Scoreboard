@@ -48,7 +48,8 @@ class dartDB:
     def create_tables(self):
         queries = [
             "CREATE TABLE IF NOT EXISTS Tournament (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, pools INTEGER, playoffs_rounds INTEGER, boards INTEGER, date TEXT NOT NULL)",
-            "CREATE TABLE IF NOT EXISTS TournamentPlayers (id INTEGER PRIMARY KEY AUTOINCREMENT, tournament_id INTEGER NOT NULL, player_id INTEGER NOT NULL, firstname TEXT NOT NULL, lastname TEXT NOT NULL, nickname TEXT NOT NULL)"
+            "CREATE TABLE IF NOT EXISTS TournamentPlayers (id INTEGER PRIMARY KEY AUTOINCREMENT, tournament_id INTEGER NOT NULL, player_id INTEGER NOT NULL, firstname TEXT NOT NULL, lastname TEXT NOT NULL, nickname TEXT NOT NULL)",
+            "CREATE TABLE IF NOT EXISTS Matches (TournamentID INTEGER, Pool INTEGER, Match INTEGER, Player1 INTEGER NOT NULL, Score1 INTEGER, Player2 INTEGER NOT NULL, Score2 INTEGER, Referee TEXT, Board INTEGER, CreatedDate DATE, ModifiedDate DATE, FOREIGN KEY(TournamentID) REFERENCES tournament(id) ON DELETE CASCADE)",
         ]
 
         for querie in queries:

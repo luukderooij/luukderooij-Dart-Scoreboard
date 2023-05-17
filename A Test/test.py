@@ -79,17 +79,19 @@ class Tournament:
 
     # Get tournament info.
     def get_latest_tournament_info(self):
-        sql_ = "SELECT rowid, * from tournament WHERE id = :id"
-        par_ = {"id": self.tournament_id}
-        with dartDB(settings.DB_FILE) as db:
-            data = db.fetchall(sql_, par_)
+        if not self.tournament_id:
+            sql_ = "SELECT rowid, * from tournament WHERE id = :id"
+            par_ = {"id": self.tournament_id}
+            with dartDB(settings.DB_FILE) as db:
+                data = db.fetchall(sql_, par_)
 
     # Get players participating in tournament.
     def get_tournament_players(self):
-        sql_ = "SELECT * FROM TournamentPlayers WHERE tournament_id = id"
-        par_ = {"id": self.tournament_id}
-        with dartDB(settings.DB_FILE) as db:
-            data = db.fetchall(sql_, par_)
+        if not self.tournament_id:
+            sql_ = "SELECT * FROM TournamentPlayers WHERE tournament_id = id"
+            par_ = {"id": self.tournament_id}
+            with dartDB(settings.DB_FILE) as db:
+                data = db.fetchall(sql_, par_)
 
     # Create Tournament and add to database.
     def create_tournament(self):
@@ -106,6 +108,7 @@ class Tournament:
             logger.info(f'Tournament created! Tournament name: {self.tournament_name}, Number of poules: {self.number_of_pools}, Datetime: {date_time}, Tournament ID: {self.tournament_id}')
         except:
             logger.error('Something went wrong with adding this tournament to the database!')
+            raise
 
     # Add Tournament players to database.
     def add_tournament_players(self):
@@ -142,11 +145,6 @@ class Tournament:
             raise ValueError('Not enough players!')
         elif number_of_players // self.number_of_pools > 7:
             raise ValueError("Too many players!")
-        
-        print(f'number_of_players {number_of_players}')
-        print(f'number of pools: {self.number_of_pools}')
-        print(f'all players {all_players}')
-
 
         # Divide players over the pools.
         pool_sizes = [len(all_players) // self.number_of_pools] * self.number_of_pools
@@ -161,17 +159,31 @@ class Tournament:
         pool_number = 1
 
         self.matches = []
-        self.match_number = 1
-
         # Create mathes for every pool.
         for pool_players in pools:
             self.create_round_robin(pool_players, pool_number)
             pool_number += 1
 
-        
-        print(self.matches)
-
-            
+        for match in self.matches:
+            sql_ = f"INSERT INTO Matches VALUES (:TournamentID, :Pool, :Match, :Player1, :Score1, :Player2, :Score2, :Referee, :Board, :CreatedDate, :ModifiedDate)"
+            par_ = {"TournamentID": self.tournament_id,
+                    "Pool": match['pool'],
+                    "Match": match['match'],
+                    "Player1": match['player1'],
+                    "Score1": 0,
+                    "Player2": match['player2'],
+                    "Score2": 0,
+                    "Referee": None,
+                    "Board": None,
+                    "CreatedDate": datetime.datetime.now(),
+                    "ModifiedDate": None}
+    
+            try:
+                with dartDB(settings.DB_FILE) as db:
+                    db.execute(sql_, par_)
+            except:
+                logger.error('Something went wrong with adding Matches to the database!')
+                raise
 
     def create_round_robin(self, pool_players, pool_number):
         # Number of players
@@ -195,10 +207,10 @@ class Tournament:
             bottom_players.append({'player_id': 'EMPTY'})
 
         # Calculate number of matches there need to be played.
-        number_of_matches = len(pool_players) * (len(pool_players) - 1) // 2
-    
-        for match in range(number_of_matches):
+        number_of_rounds = (len(top_players) + len(bottom_players)) - 1
+        match_number = 1
 
+        for match in range(number_of_rounds):
             for top_player in top_players:
                 bottom_player = bottom_players[top_players.index(top_player)]
 
@@ -212,12 +224,12 @@ class Tournament:
 
                     dict = {
                         "pool": pool_number,
-                        "match": self.match_number,
+                        "match": match_number,
                         "player1": top_player['player_id'],
                         "player2": bottom_player['player_id']
                     }
-                    self.match_number += 1
 
+                    match_number += 1
                     self.matches.append(dict)
 
             # Rotate players in round-robin.
@@ -230,78 +242,6 @@ class Tournament:
         
 
 
-
-
-
-
-
-        # # Add emty spot by odd players.
-        # if (number_of_players % 2) != 0:
-        #     top_players.append("EMPTY")
-        #     number_of_players = number_of_players + 1
-
-        # # Create round-robin bottom side list.
-        # bottom_players = players[len(players)//2:]
-        # bottom_players.reverse()
-
-        # # Create matches and save in list
-        # match_number = 1
-        # self.matches = []
-
-        # for match in range(number_of_players - 1):
-        #     for top_player in top_players:
-        #         position = top_players.index(top_player)
-        #         bottom_player = bottom_players[position]
-            
-        #         if top_player != "EMPTY" and bottom_player != "EMPTY":
-        #             list = [top_player, bottom_player]
-        #             random.shuffle(list)
-        #             top_player = list[0]
-        #             bottom_player = list[1]
-
-        #             dict = {
-        #                 "match": match_number,
-        #                 "player1": top_player,
-        #                 "player2": bottom_player
-        #             }
-
-        #             self.matches.append(dict)
-        #             match_number = match_number + 1
-
-        #     # Rotate players in round-robin.
-        #     top_players.insert(1, bottom_players[0])
-        #     bottom_players.append(top_players[-1])
-        #     top_players.pop()
-        #     bottom_players.pop(0)
-
-        # for match in self.matches:
-        #     for key, value in match.items():
-        #         if key == "match":
-        #             match = value
-        #         if key == "player1":
-        #             player1 = value
-        #         if key == "player2":
-        #             player2 = value
-
-        #     sql_ = """INSERT INTO match VALUES (:date, :pool,
-        #             :match, :player1, :score1, :player2, :score2, 
-        #             :referee, :tournament_id, :board)"""
-        #     par_ = {"date": datetime.datetime.now(),
-        #             "pool": self.pool,
-        #             "match": match,
-        #             "player1": player1,
-        #             "score1": 0,
-        #             "player2": player2,
-        #             "score2": 0,
-        #             "referee": "",
-        #             "board": 1,
-        #             "tournament_id": self.tournament_id}
-
-        #     with dartDB(settings.DB_FILE) as db:
-        #         db.execute(sql_, par_)  
-                
-        #     self.set_boards()  
-        # self.set_referee()  
 
 
 
@@ -330,210 +270,21 @@ players = [
 
 
 number_of_players = 7
-number_of_pools = 3
+number_of_pools = 4
 number_of_boards = 1
 
 new_players = players[:number_of_players]
 
-for a in new_players:
-    print(a)
-
-
-
-
+#tournament = Tournament()
 tournament = Tournament(None, 'Een toernooitje', number_of_pools, number_of_boards, new_players)
 
 try:
     tournament.create_tournament()
     tournament.create_matches()
-    # tournament.add_tournament_players()
+    tournament.add_tournament_players()
 
 except Exception as e:
     print('error')
     print(e)
         
 
-'''
-class Tournament:
-    def __init__(self, name, num_of_pools, players):
-        self.table = "tournament"
-
-        self.name = name
-        self.num_of_pools = num_of_pools    
-        self.players = players  
-
-        print(f'self.pools: {self.num_of_pools}')
-        print(f'self.players: {self.players}')
-
-
-    def write_players_to_db(self):
-        sql_ = f"INSERT INTO tournamentplayers VALUES (tournamentID, :tournament_name, :number_of_pools, :playoffs_rounds, :boards, :date)"
-        par_ = {"tournamentID": self.name,
-                "firstName": self.num_of_pools,
-                "lastName": self.playoffs_rounds,
-                "boards": self.boards,
-                "date": date_time}
-
-
-    def write_to_db(self):
-        date_time = datetime.datetime.now()
-        sql_ = f"INSERT INTO tournament VALUES (NULL, :tournament_name, :number_of_pools, :playoffs_rounds, :boards, :date)"
-        par_ = {"tournament_name": self.name,
-                "number_of_pools": self.num_of_pools,
-                "playoffs_rounds": self.playoffs_rounds,
-                "boards": self.boards,
-                "date": date_time}
-        try:
-            with dartDB(settings.DB_FILE) as db:
-                self.tournament_id = db.execute(sql_, par_)
-            logger.info(f'Tournament created! Tournament name: {self.name}, Number of poules: {self.pools}, Datetime: {date_time}, Tournament ID: {self.tournament_id}')
-        except:
-            logger.error('Something went wrong with creating a tournament!')
-
-
-
-
-
-
-# Prompt the user to enter the number of pools
-num_of_pools = int(input("Enter the number of pools: "))
-
-players = [
-    {"first_name": "Bob", "last_name": "Smith"},
-    {"first_name": "Isabella", "last_name": "Brown"},
-    {"first_name": "David", "last_name": "Anderson"},
-    {"first_name": "Charlie", "last_name": "Davis"},
-    {"first_name": "Frank", "last_name": "Lee"},
-    {"first_name": "Grace", "last_name": "Wilson"},
-    {"first_name": "Henry", "last_name": "Garcia"},
-    {"first_name": "Jack", "last_name": "Johnson"},
-    {"first_name": "Alice", "last_name": "Martin"},
-    {"first_name": "Emily", "last_name": "Taylor"}  
-]
-
-# Create a Playoffs object with the gathered pool data
-Tournament = Tournament(num_of_pools, players)
-
-
-# Generate the playoff schedule
-schedule = playoffs.create_schedule()
-
-
-
-
-
-
-
-class Playoffs:
-    def __init__(self, *pools):
-        self.pools = pools
-        self.num_pools = len(self.pools)
-        self.players = self.flatten_pools()
-        self.num_players = len(self.players)
-
-    def flatten_pools(self):
-        flattened_pools = []
-        for pool in self.pools:
-            flattened_pools += pool
-        return flattened_pools
-
-    def create_schedule(self):
-        if self.num_players < 2:
-            raise ValueError("At least 2 players are required to create a playoff schedule")
-
-        num_rounds = self.calculate_num_rounds()
-        schedule = [[] for _ in range(num_rounds)]
-
-        print(f'self.pools: {self.pools}')
-
-        for i, pool in enumerate(self.pools):
-            for j, player in enumerate(pool):
-                index = i * len(pool) + j
-                schedule[0].append((player, index))
-
-
-        print(f'schedule: {schedule}')
-
-        # for r in range(1, num_rounds):
-        #     round_matches = []
-        #     for i in range(0, self.num_players, 2):
-        #         if i + 1 < self.num_players:
-        #             player1, index1 = schedule[r - 1][i]
-        #             player2, index2 = schedule[r - 1][i + 1]
-        #             match = (player1, player2, index1, index2)
-        #             round_matches.append(match)
-        #     schedule[r] = round_matches
-
-        # return schedule
-
-    def calculate_num_rounds(self):
-        num_matches = self.num_players // 2
-        num_rounds = 1
-        while num_matches > 0:
-            num_rounds += 1
-            num_matches //= 2
-        return num_rounds
-
-
-
-
-
-
-
-# Prompt the user to enter the number of pools
-num_pools = int(input("Enter the number of pools: "))
-
-# Create an empty list to store the pool data
-pools = []
-
-# Loop through each pool and gather player data
-for i in range(num_pools):
-    # Prompt the user to enter the player data for this pool
-    player_input = input(f"Enter the player data for pool {i+1} (first name, last name, nickname), separated by commas: ")
-    # Split the input into a list of player data
-    player_data = player_input.split(",")
-    # Add the player data to the pools list
-    pools.append(player_data)
-
-# Print the list of pools and players
-print("Pools and players:")
-for i, pool in enumerate(pools):
-    print(f"Pool {i+1}:")
-    for player in pool:
-        first_name, last_name, nickname = player.split()
-        print(f" - {first_name} {last_name} ({nickname})")
-
-pools = [['Luuk', ' Tim', ' Hanny', ' Sjaak'], ['Kobus', ' Patrick', ' Justin'], ['Mark', ' Nick', ' Lvs', ' Rick']]
-
-# Create a Playoffs object with the gathered pool data
-playoffs = Playoffs(*pools)
-
-# Generate the playoff schedule
-schedule = playoffs.create_schedule()
-
-# Print the schedule
-for r, matches in enumerate(schedule):
-    print(f"Round {r+1}:")
-    for match in matches:
-        print(f"{match[0]} vs {match[1]}")
-    print()
-
-1
-
-
-
-
-'''   
-
-# pool_sizes = [len(all_players) // num_pools] * num_pools
-#         print(f'pool_size: {pool_sizes}')
-#         remainder = len(all_players) % num_pools
-#         print(f'remainder: {remainder}')
-#         for i in range(remainder):
-#             pool_sizes[i] += 1
-        
-#         pools = []
-#         start = 0
-#         for size in pool_sizes:
-#             pools.append(all_players[start:start+size])
-#             start += size
