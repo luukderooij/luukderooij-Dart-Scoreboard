@@ -245,6 +245,111 @@ class Tournament:
 
 
 
+
+
+
+
+
+class Playoffs:
+    def __init__(self) -> None:
+        self.table = "playoffs"
+
+
+    def bracket_data(self, tournament_id):
+        with dartDB(settings.DB_FILE) as db:
+            sql_ = "SELECT * FROM playoffs WHERE tournament_id = :id"
+            par_ = {"id": tournament_id}         
+            data = db.fetchall(sql_, par_)   
+        return data
+
+    def create(self, tournament_id, rounds=None, players=None):
+        if self.bracket_data(tournament_id):
+            logger.info("Playoffs already exists!")   
+            return
+
+        if not rounds:
+            rounds = 2
+
+        if not players:
+            standing_data = Tournament().get_standings(tournament_id)
+ 
+        data = Tournament().get_tournament_info_data(tournament_id)
+        poules = int((data[0][3]))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 players = [    
     {"player_id": 1, "first_name": "Mia", "last_name": "Garcia", "nickname": "MGar"}, 
     {"player_id": 2, "first_name": "Benjamin", "last_name": "Jones", "nickname": "BJon"},

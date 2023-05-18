@@ -47,9 +47,11 @@ class dartDB:
 
     def create_tables(self):
         queries = [
-            "CREATE TABLE IF NOT EXISTS Tournament (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, pools INTEGER, playoffs_rounds INTEGER, boards INTEGER, date TEXT NOT NULL)",
-            "CREATE TABLE IF NOT EXISTS TournamentPlayers (id INTEGER PRIMARY KEY AUTOINCREMENT, tournament_id INTEGER NOT NULL, player_id INTEGER NOT NULL, firstname TEXT NOT NULL, lastname TEXT NOT NULL, nickname TEXT NOT NULL)",
-            "CREATE TABLE IF NOT EXISTS Matches (TournamentID INTEGER, Pool INTEGER, Match INTEGER, Player1 INTEGER NOT NULL, Score1 INTEGER, Player2 INTEGER NOT NULL, Score2 INTEGER, Referee TEXT, Board INTEGER, CreatedDate DATE, ModifiedDate DATE, FOREIGN KEY(TournamentID) REFERENCES tournament(id) ON DELETE CASCADE)",
+            "CREATE TABLE IF NOT EXISTS Tournament (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Pools INTEGER, Teams INTEGER, PlayoffRounds INTEGER, Boards INTEGER, Winner TEXT, CreatedDate Date)",
+            "CREATE TABLE IF NOT EXISTS TournamentPlayers (Id INTEGER PRIMARY KEY AUTOINCREMENT, TournamentId INTEGER NOT NULL, PlayerId INTEGER NOT NULL, Firstname TEXT NOT NULL, Lastname TEXT NOT NULL, Nickname TEXT NOT NULL, FOREIGN KEY(TournamentId) REFERENCES Tournament(Id) ON DELETE CASCADE)",
+            "CREATE TABLE IF NOT EXISTS TournamentTeams (Id INTEGER PRIMARY KEY AUTOINCREMENT, TournamentId INTEGER NOT NULL, Player1_Id INTEGER NOT NULL, Player1_Firstname TEXT NOT NULL, Player1_Lastname TEXT NOT NULL, Player1_Nickname TEXT NOT NULL,Player2_Id INTEGER NOT NULL, Player2_Firstname TEXT NOT NULL, Player2_Lastname TEXT NOT NULL, Player2_Nickname TEXT NOT NULL, FOREIGN KEY(TournamentId) REFERENCES Tournament(Id) ON DELETE CASCADE)",
+            "CREATE TABLE IF NOT EXISTS RoundRobinMatches (Id INTEGER PRIMARY KEY AUTOINCREMENT, TournamentId INTEGER NOT NULL, Pool INTEGER, Match INTEGER, Player1 INTEGER NOT NULL, Score1 INTEGER, Player2 INTEGER NOT NULL, Score2 INTEGER, Referee TEXT, Board INTEGER, CreatedDate DATE, ModifiedDate DATE, FOREIGN KEY(TournamentId) REFERENCES Tournament(Id) ON DELETE CASCADE)",
+            "CREATE TABLE IF NOT EXISTS PlayoffMatches (Id INTEGER PRIMARY KEY AUTOINCREMENT, TournamentId INTEGER NOT NULL, Round INTEGER, Match INTEGER, Player1 INTEGER NOT NULL, Score1 INTEGER, Player2 INTEGER NOT NULL, Score2 INTEGER, Referee TEXT, Board INTEGER, CreatedDate DATE, ModifiedDate DATE, FOREIGN KEY(TournamentId) REFERENCES Tournament(Id) ON DELETE CASCADE)",
         ]
 
         for querie in queries:
