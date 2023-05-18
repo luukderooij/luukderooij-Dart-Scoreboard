@@ -50,40 +50,38 @@ with dartDB(settings.DB_FILE) as db:
 
 
 class Tournament:
-    def __init__(self, tournament_id=None, tournament_name=None, number_of_pools=None, number_of_boards=None, players=None):
+    def __init__(self, tournament_id=None):
         if tournament_id:
             self.tournament_id = tournament_id
         else:
             self.get_latest_tournament_id()
 
-        if not None in (tournament_name, number_of_pools, number_of_boards):
-            self.tournament_name = tournament_name
-            self.number_of_pools = number_of_pools
-            self.number_of_boards = number_of_boards
-        else:
-            self.get_latest_tournament_info()
-
-        if players:
-            self.players = players
-        else:
-            self.get_tournament_players()
-
 
     # Get tournament latest id.
     def get_latest_tournament_id(self):
-        sql_ = "SELECT MAX(id) FROM tournament"
+        sql_ = "SELECT MAX(Id) FROM Tournament"
         par_ = {}
         with dartDB(settings.DB_FILE) as db:
             tournament_id = db.fetchone(sql_, par_)
         self.tournament_id = tournament_id[0]
 
     # Get tournament info.
-    def get_latest_tournament_info(self):
-        if not self.tournament_id:
-            sql_ = "SELECT rowid, * from tournament WHERE id = :id"
-            par_ = {"id": self.tournament_id}
+    def get_tournament_info(self):
+        if self.tournament_id:
+            sql_ = "SELECT * from Tournament WHERE Id = :Id"
+            par_ = {"Id": self.tournament_id}
             with dartDB(settings.DB_FILE) as db:
-                data = db.fetchall(sql_, par_)
+                data = db.fetchone(sql_, par_)
+        
+        self.tournament_name = data[1]
+        self.number_of_pools = data[2]
+        self.teams = data[3]
+        self.playoffs_rounds = data[4]
+        self.number_of_boards = data[5]
+        self.winner = data[6]
+        self.created_date = data[7]
+        
+        return data
 
     # Get players participating in tournament.
     def get_tournament_players(self):
@@ -94,21 +92,33 @@ class Tournament:
                 data = db.fetchall(sql_, par_)
 
     # Create Tournament and add to database.
-    def create_tournament(self):
+    def create_tournament(self, tournament_name, number_of_pools, teams, boards):
+        '''
+        Create a tournamant and add to database.
+        - Tournament name
+        - Number of pools
+        - Teams
+        - Number of boards per pool
+        '''
         date_time = datetime.datetime.now()
-        sql_ = f"INSERT INTO tournament VALUES (NULL, :tournament_name, :number_of_pools, NULL, :boards, :date)"
-        par_ = {"tournament_name": self.tournament_name,
-                "number_of_pools": self.number_of_pools,
-                "boards": self.number_of_pools,
-                "date": date_time}
+        sql_ = f"INSERT INTO tournament VALUES (NULL, :Name, :Pools, :Teams, :PlayoffsRounds, :Boards, NULL, :CreatedDate)"
+        par_ = {"Name": tournament_name,
+                "Pools": number_of_pools,
+                "Teams": int(teams),
+                "PlayoffsRounds": 2,
+                "Boards": boards,
+                "CreatedDate": date_time}
         
         try:
             with dartDB(settings.DB_FILE) as db:
                 self.tournament_id = db.execute(sql_, par_)
-            logger.info(f'Tournament created! Tournament name: {self.tournament_name}, Number of poules: {self.number_of_pools}, Datetime: {date_time}, Tournament ID: {self.tournament_id}')
+            logger.info(f'Tournament created! Tournament name: {tournament_name}, Number of poules: {number_of_pools}, Datetime: {date_time}, Tournament ID: {self.tournament_id}')
         except:
             logger.error('Something went wrong with adding this tournament to the database!')
             raise
+        
+        self.tournament_info = self.get_tournament_info()
+        return self.tournament_info
 
     # Add Tournament players to database.
     def add_tournament_players(self):
@@ -377,14 +387,17 @@ players = [
 number_of_players = 7
 number_of_pools = 4
 number_of_boards = 1
+teams = False
+tournament_name = 'Een Toernooitje'
+
 
 new_players = players[:number_of_players]
 
 #tournament = Tournament()
-tournament = Tournament(None, 'Een toernooitje', number_of_pools, number_of_boards, new_players)
+tournament = Tournament()
 
 try:
-    tournament.create_tournament()
+    print(tournament.create_tournament(tournament_name, number_of_pools, teams, number_of_boards))
     tournament.create_matches()
     tournament.add_tournament_players()
 

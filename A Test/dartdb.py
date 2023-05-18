@@ -47,7 +47,7 @@ class dartDB:
 
     def create_tables(self):
         queries = [
-            "CREATE TABLE IF NOT EXISTS Tournament (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Pools INTEGER, Teams INTEGER, PlayoffRounds INTEGER, Boards INTEGER, Winner TEXT, CreatedDate Date)",
+            "CREATE TABLE IF NOT EXISTS Tournament (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Pools INTEGER NOT NULL, Teams INTEGER, PlayoffRounds INTEGER, Boards INTEGER, Winner TEXT, CreatedDate Date)",
             "CREATE TABLE IF NOT EXISTS TournamentPlayers (Id INTEGER PRIMARY KEY AUTOINCREMENT, TournamentId INTEGER NOT NULL, PlayerId INTEGER NOT NULL, Firstname TEXT NOT NULL, Lastname TEXT NOT NULL, Nickname TEXT NOT NULL, FOREIGN KEY(TournamentId) REFERENCES Tournament(Id) ON DELETE CASCADE)",
             "CREATE TABLE IF NOT EXISTS TournamentTeams (Id INTEGER PRIMARY KEY AUTOINCREMENT, TournamentId INTEGER NOT NULL, Player1_Id INTEGER NOT NULL, Player1_Firstname TEXT NOT NULL, Player1_Lastname TEXT NOT NULL, Player1_Nickname TEXT NOT NULL,Player2_Id INTEGER NOT NULL, Player2_Firstname TEXT NOT NULL, Player2_Lastname TEXT NOT NULL, Player2_Nickname TEXT NOT NULL, FOREIGN KEY(TournamentId) REFERENCES Tournament(Id) ON DELETE CASCADE)",
             "CREATE TABLE IF NOT EXISTS RoundRobinMatches (Id INTEGER PRIMARY KEY AUTOINCREMENT, TournamentId INTEGER NOT NULL, Pool INTEGER, Match INTEGER, Player1 INTEGER NOT NULL, Score1 INTEGER, Player2 INTEGER NOT NULL, Score2 INTEGER, Referee TEXT, Board INTEGER, CreatedDate DATE, ModifiedDate DATE, FOREIGN KEY(TournamentId) REFERENCES Tournament(Id) ON DELETE CASCADE)",
