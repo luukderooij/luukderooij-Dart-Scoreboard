@@ -49,16 +49,12 @@ with dartDB(settings.DB_FILE) as db:
 
 class Tournament:
     '''
-    get_latest_tournament_id() : Returns last added database id.
-    get_tournament_info() : Return information about the tournament.
-    get_players() : Returns all players participating the tournament.
-    create_tournament() : 
-    add_players() :
-    create_matches() : 
-    create_round_robin() : 
-
+    - get_latest_tournament_id()
+    - get_tournament_info()
+    - get_players()
+    - create()
+    - add_players()
     '''
-
     def __init__(self, tournament_id=None):
         if tournament_id:
             self.tournament_id = tournament_id
@@ -66,7 +62,6 @@ class Tournament:
             self.get_latest_tournament_id()
 
 
-    # Get tournament latest id.
     def get_latest_tournament_id(self):
         sql_ = "SELECT MAX(Id) FROM Tournament"
         par_ = {}
@@ -77,7 +72,6 @@ class Tournament:
         return self.tournament_id
 
 
-    # Get tournament info.
     def get_tournament_info(self):
         if self.tournament_id:
             sql_ = "SELECT * from Tournament WHERE Id = :Id"
@@ -96,7 +90,6 @@ class Tournament:
         return data
 
 
-    # Get players participating in tournament.
     def get_players(self):
         if self.tournament_id:
             sql_ = "SELECT * FROM TournamentPlayers WHERE TournamentId = :id"
@@ -112,15 +105,7 @@ class Tournament:
         return data
 
 
-    # Create Tournament and add to database.
-    def create_tournament(self, tournament_name, number_of_pools, teams, boards):
-        '''
-        Create a tournamant and add to database.
-        - Tournament name
-        - Number of pools
-        - Teams
-        - Number of boards per pool
-        '''
+    def create(self, tournament_name, number_of_pools, teams, boards):
         date_time = datetime.datetime.now()
         sql_ = f"INSERT INTO tournament VALUES (NULL, :Name, :Pools, :Teams, :PlayoffsRounds, :Boards, NULL, :CreatedDate)"
         par_ = {"Name": tournament_name,
@@ -142,7 +127,6 @@ class Tournament:
         return self.tournament_info
 
 
-    # Add Tournament players to database.
     def add_players(self, players):
         for player in players:
             firstname = player['first_name']
@@ -166,10 +150,21 @@ class Tournament:
         self.get_players()
 
 
-    def create_matches(self):
+
+
+
+class RoundRobin():
+    def __init__(self, tournament_id):
+        self.tournament_id = tournament_id
+
+
+    def create_matches(self, players, tournament_info):
+        self.number_of_pools = tournament_info[2]
+        self.number_of_boards = tournament_info[5]
+        
         # Get player id
         participants = []
-        for player in self.players:
+        for player in players:
             participants.append(player[0])
         
         # Random list.
@@ -320,74 +315,6 @@ class Playoffs:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 players = [    
     {"player_id": 1, "first_name": "Mia", "last_name": "Garcia", "nickname": "MGar"}, 
     {"player_id": 2, "first_name": "Benjamin", "last_name": "Jones", "nickname": "BJon"},
@@ -425,9 +352,24 @@ new_players = players[:number_of_players]
 tournament = Tournament()
 
 try:
-    print(tournament.create_tournament(tournament_name, number_of_pools, teams, number_of_boards))
+    tournament_info = tournament.create(tournament_name, number_of_pools, teams, number_of_boards)
     tournament.add_players(new_players)
-    tournament.create_matches()
+    
+    # tournament.create_matches()
+    print(tournament.get_tournament_info())
+
+    tournament_id = tournament_info[0]
+
+
+    participants = tournament.get_players()
+  
+
+    roundrobin = RoundRobin(tournament_id)
+
+    roundrobin.create_matches(participants, tournament_info)
+
+    print(participants)
+
 
 
 
