@@ -49,11 +49,19 @@ with dartDB(settings.DB_FILE) as db:
 
 class Tournament:
     '''
-    - get_latest_tournament_id()
-    - get_tournament_info()
-    - get_players()
-    - create()
-    - add_players()
+    The Tournament Class:
+    - create(): Creates a tournament 
+    - add_players(): Add players to a tournament.
+    - get_tournaments(): Get all the tournament form db.
+    - get_latest_tournament_id(): Get the latest tournament id from db.
+    - get_tournament_info(): Get info about a single tournament.
+    - get_players(): Get all players participating in tournament. 
+    - get_tournament_matches_data() : 
+    - delete_tournament(): Delete tournament.
+
+
+    - set referee
+    - set boards
     '''
     def __init__(self, tournament_id=None):
         if tournament_id:
@@ -62,6 +70,7 @@ class Tournament:
             self.get_latest_tournament_id()
 
 
+    # Returns latest tournament id.
     def get_latest_tournament_id(self):
         sql_ = "SELECT MAX(Id) FROM Tournament"
         par_ = {}
@@ -70,6 +79,15 @@ class Tournament:
         self.tournament_id = tournament_id[0]
 
         return self.tournament_id
+    
+    # Returns all tournaments.
+    def get_tournaments(self):
+        sql_ = f"SELECT * FROM Tournament"
+        par_ = {}    
+        with dartDB(settings.DB_FILE) as db:
+            data = db.fetchall(sql_, par_)
+
+        return data
 
 
     def get_tournament_info(self):
@@ -149,6 +167,41 @@ class Tournament:
 
         self.get_players()
 
+    # Get tournament matches data
+    def get_tournament_matches_data(self, tournament_id, pool=None):
+        if pool != None:
+            sql_ = "SELECT * FROM RoundRobinMatches WHERE TournamentId = :id AND Pool = :pool"
+            par_ = {"id": tournament_id, "pool": pool}             
+        else:
+            sql_ = "SELECT * FROM RoundRobinMatches WHERE TournamentId = :id"
+            par_ = {"id": tournament_id}
+        
+        with dartDB(settings.DB_FILE) as db:
+            data = db.fetchall(sql_, par_)
+        return data  
+
+    # delete tournament
+    def delete_tournament(self, tournament_id):
+        sql_ = "DELETE FROM Tournament WHERE rowid = :id"
+        par_ = {"id": tournament_id} 
+        with dartDB(settings.DB_FILE) as db:
+            db.execute(sql_, par_)    
+
+
+    # Update matches
+    def update_matches(self, score1, score2, tournament_id, pool_id, match_id):
+            sql_ = """UPDATE RoundRobinMatches SET Score1 = :score1, Score2 = :score2 
+                        WHERE TournamentId = :tournament_id AND 
+                        Pool = :pool_id AND Match = :match"""
+            par_ = {"score1": score1, 
+                    "score2": score2, 
+                    "tournament_id": tournament_id,
+                    "pool_id": pool_id,
+                    "match": match_id}
+            with dartDB(settings.DB_FILE) as db:
+                db.execute(sql_, par_)
+
+            # self.create_standings(tournament_id)
 
 
 
@@ -219,13 +272,15 @@ class RoundRobin():
                 logger.error('Something went wrong with adding Matches to the database!')
                 raise
 
+
+
     def create_round_robin(self, pool_players, pool_number):
         # Number of players
         number_of_players = len(pool_players)
 
-        # Check if there can be played om multiple boards.        
-        if number_of_players < 6 and self.number_of_boards > 1:
-            raise ValueError(f"Too many boards selected for {number_of_players} players! 6 Players needed for 2 boards.")
+        # # Check if there can be played om multiple boards.        
+        # if number_of_players < 6 and self.number_of_boards > 1:
+        #     raise ValueError(f"Too many boards selected for {number_of_players} players! 6 Players needed for 2 boards.")
 
         # Create round-robin top side list.
         top_players = pool_players[:len(pool_players)//2]
@@ -372,7 +427,9 @@ try:
 
 
 
+    print(tournament.get_tournament_matches_data(tournament_id))
 
+    tournament.delete_tournament(2)
 
 
 
