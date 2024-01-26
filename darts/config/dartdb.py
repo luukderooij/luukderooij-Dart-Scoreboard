@@ -1,7 +1,5 @@
-import os
 import sqlite3
 import logging
-import datetime
 
 from sqlite3 import Error
 from datetime import date
@@ -44,24 +42,19 @@ class dartDB:
     def __exit__(self,exc_type,exc_value,traceback):
         self.close()
 
+########################################################################################
+# Database create tables
+########################################################################################
 
     def create_tables(self):
-        queries = [
+        statements = [
             "CREATE TABLE IF NOT EXISTS db (id INTEGER PRIMARY KEY AUTOINCREMENT, version TEXT NOT NULL)",
-            "CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT NOT NULL, lastname TEXT NOT NULL, nickname TEXT NOT NULL, arcadename TEXT, email TEXT, date_joined DATE NOT NULL)",
-            "CREATE TABLE IF NOT EXISTS onehundredandeighty (id INTEGER PRIMARY KEY AUTOINCREMENT, player_id INTEGER, date DATE NOT NULL, FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE)",
-            "CREATE TABLE IF NOT EXISTS winner (id INTEGER PRIMARY KEY AUTOINCREMENT, player_id INTEGER, date DATE NOT NULL, FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE)",
-            "CREATE TABLE IF NOT EXISTS finishes (id INTEGER PRIMARY KEY AUTOINCREMENT, player_id INTEGER, score TEXT NOT NULL, combi TEXT NOT NULL, date TEXT NOT NULL,  FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE)",
-            "CREATE TABLE IF NOT EXISTS tournament (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, pools INTEGER, playoffs_rounds INTEGER, boards INTEGER, date TEXT NOT NULL)",
-            "CREATE TABLE IF NOT EXISTS match (date TEXT NOT NULL, pool INTEGER, match TEXT NOT NULL, player1 TEXT NOT NULL, score1 INTEGER, player2 TEXT NOT NULL, score2 INTEGER, referee TEXT NOT NULL, tournament_id INTEGER, board INTEGER, FOREIGN KEY(tournament_id) REFERENCES tournament(id) ON DELETE CASCADE)",
-            "CREATE TABLE IF NOT EXISTS standings (tournament_id INTEGER, poule INTEGER, place INTEGER, player_name TEXT NOT NULL, matches_played INTEGER, matches_won INTEGER, matches_lost INTEGER, legs_scored INTEGER, legs_against INTEGER, legs_difference INTEGER, FOREIGN KEY(tournament_id) REFERENCES tournament(id) ON DELETE CASCADE)",
-            "CREATE TABLE IF NOT EXISTS bracketmatches (tournament_id INTEGER, round INTEGER, match INTEGER, board INTEGER, player1 TEXT NOT NULL, score1 INTEGER, player2 TEXT NOT NULL, score2 INTEGER, referee TEXT NOT NULL, date TEXT NOT NULL, FOREIGN KEY(tournament_id) REFERENCES tournament(id) ON DELETE CASCADE)",
-            "CREATE TABLE IF NOT EXISTS playoffs (tournament_id INTEGER, round INTEGER, match INTEGER, board INTEGER, player_1 TEXT NOT NULL, score_1 INTEGER, player_2 TEXT NOT NULL, score_2 INTEGER, referee TEXT NOT NULL, date TEXT NOT NULL, FOREIGN KEY(tournament_id) REFERENCES tournament(id) ON DELETE CASCADE)"
+            "CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT NOT NULL, lastname TEXT NOT NULL, nickname TEXT NOT NULL, arcadename TEXT, date_joined DATE NOT NULL)",
         ]
 
-        for querie in queries:
+        for statement in statements:
             try:
-                self.cursor.execute(querie)
+                self.cursor.execute(statement)
             except Error as e:
                 logger.error(e)
 
