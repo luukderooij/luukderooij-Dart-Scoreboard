@@ -20,8 +20,6 @@ class RegistrationForm(FlaskForm):
     firstname = StringField('Firstname', validators=[DataRequired()])
     lastname = StringField('Lastname', validators=[DataRequired()])
     nickname = StringField('Nickname', validators=[DataRequired(), Length(min=2, max=20)])
-    arcadename = StringField('Arcadename', validators=[Optional(), Length(min=3, max=3)])
-    email = StringField('Email', validators=[Optional(), Email()])
     submit = SubmitField('Sign Up')
 
 
@@ -39,46 +37,3 @@ def players():
                             form = form)
 
 
-@main.route('/180', methods=['GET', 'POST'])
-def onehunderdandeighty():
-    return render_template('180.html')
-
-
-@main.route('/winner', methods=['GET', 'POST'])
-def winner():
-    return render_template('winner.html')
-
-
-@main.route('/finishes', methods=['GET', 'POST'])
-def finishes():
-    return render_template('finishes.html')
-
-
-@main.route('/create-tournament')
-def createtournament():
-    return render_template('create-tournament.html')
-
-
-@main.route('/tournament')
-def tournament():
-    return render_template('tournament.html')
-
-
-@main.route('/playoffs')
-def playoffs():
-    return render_template('playoffs.html')
-
-
-@main.route('/winners')
-def winners():
-    return render_template('winners.html')
-
-
-@main.route('/rules')
-def rules():
-    return render_template('rules.html')    
-    
-
-@main.route('/log')
-def log():
-    return render_template('log.html')
