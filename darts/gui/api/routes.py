@@ -18,7 +18,7 @@ from darts.players import Players
 from darts.toneighty import TonEighty
 from darts.winners import Winners
 from darts.finishes import Finishes
-from darts import settings
+from darts.config import settings
 from darts.players import Players
 from darts.toneighty import TonEighty
 from darts.winners import Winners

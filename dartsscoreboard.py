@@ -3,10 +3,10 @@ import logging
 
 from waitress import serve
 
-from darts import settings
-from darts.config import Configuration
+from darts.config import settings
+from darts.config.config import Configuration
 from darts.gui import app
-from darts.dartdb import dartDB
+from darts.config.dartdb import dartDB
 
 
 __version__ = "1.0.3"

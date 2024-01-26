@@ -1,8 +1,8 @@
 import logging
 import datetime
 
-from darts.dartdb import dartDB
-from darts import settings
+from darts.config.dartdb import dartDB
+from darts.config import settings
 
 logger = logging.getLogger(__name__)
 

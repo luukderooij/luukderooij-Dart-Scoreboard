@@ -1,7 +1,7 @@
 import os
 import configparser
 
-from darts import settings
+from darts.config import settings
 
 
 class Configuration:

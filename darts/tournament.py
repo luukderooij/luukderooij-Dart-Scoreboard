@@ -2,9 +2,9 @@ import logging
 import datetime
 import random
 
-from darts.dartdb import dartDB
+from darts.config.dartdb import dartDB
 from darts.players import Players
-from darts import settings
+from darts.config import settings
 
 logger = logging.getLogger(__name__)
 

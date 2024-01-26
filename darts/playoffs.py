@@ -3,9 +3,9 @@ import datetime
 
 import pandas as pd
 
-from darts.dartdb import dartDB
+from darts.config.dartdb import dartDB
 from darts.tournament import Tournament
-from darts import settings
+from darts.config import settings
 
 logger = logging.getLogger(__name__)
 
