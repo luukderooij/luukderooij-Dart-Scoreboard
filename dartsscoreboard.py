@@ -5,8 +5,9 @@ from waitress import serve
 
 from darts.config import settings
 from darts.config.config import Configuration
-from darts.gui import app
 from darts.config.dartdb import dartDB
+
+from darts.gui import app
 
 
 __version__ = "1.0.3"
