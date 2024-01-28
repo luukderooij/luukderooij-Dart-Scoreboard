@@ -49,7 +49,7 @@ class dartDB:
     def create_tables(self):
         statements = [
             "CREATE TABLE IF NOT EXISTS db (id INTEGER PRIMARY KEY AUTOINCREMENT, version TEXT NOT NULL)",
-            "CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT NOT NULL, lastname TEXT NOT NULL, nickname TEXT NOT NULL, date_joined DATE NOT NULL, datetime_updated DATE NOT NULL)",
+            "CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT NOT NULL, lastname TEXT NOT NULL, nickname TEXT NOT NULL, date_joined DATE NOT NULL, date_updated DATE NOT NULL)",
         ]
 
         for statement in statements:
