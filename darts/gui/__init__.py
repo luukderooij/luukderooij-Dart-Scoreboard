@@ -16,7 +16,6 @@ app.register_blueprint(main)
 app.register_blueprint(api)
 app.register_blueprint(tv)
 
-
 @app.template_filter()
 def format_datetime(value, format="%d-%m-%Y"):
     """Format a date time to (Default): d Mon YYYY HH:MM P"""
