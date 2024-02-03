@@ -7,75 +7,75 @@ from darts.config import settings
 logger = logging.getLogger(__name__)
 
 class Players:
+    # Class to handle players in the database
+    # The class will handle the following:
+    # 1. Fetching all players
+    # 2. Fetching a single player by id
+    # 3. Adding a new player
+    # 4. Updating a player
+    # 5. Removing a player
+    # 6. Checking if a player exists by id
     def __init__(self):
         self.table = "players"
-
-    def fetchall(self):
-        sql_ = f"SELECT * FROM {self.table}"
-        par_ = {}    
-        with dartDB(settings.DB_FILE) as db:
-            data = db.fetchall(sql_, par_)
-
-        if data:
-            players = []
-            for player in data:
-                dictionary = {"id": int(player[0]),
-                            "firstname": str(player[1]),
-                            "lastname": str(player[2]),
-                            "nickname": str(player[3]),
-                            "arcadename": str(player[4]),
-                            "email": str(player[5]),
-                            "date_joined": str(player[6])}
-                players.append(dictionary)
-
-            return players
-        else:
-            logger.error(f"No players found in database!")
-            return None
 
     def fetchone(self, id):
         sql_ = f"SELECT * FROM {self.table} WHERE id = :id"
         par_ = {"id": id}        
         with dartDB(settings.DB_FILE) as db:           
             data = db.fetchone(sql_, par_)
-
         if data:
             player = {"id": int(data[0]),
                         "firstname": str(data[1]),
                         "lastname": str(data[2]),
                         "nickname": str(data[3]),
-                        "arcadename": str(data[4]),
-                        "email": str(data[5]),
-                        "date_joined": str(data[6])}
-
+                        "date_joined": str(data[4]),
+                        "date_updated": str(data[5])}
             return player
         else:
             logger.error(f"No player with id: {id} found in database!")
             return None
 
-    def add(self, firstname, lastname, nickname, arcadename, email):
+    def fetchall(self):
+        sql_ = f"SELECT * FROM {self.table}"
+        par_ = {}    
+        with dartDB(settings.DB_FILE) as db:
+            data = db.fetchall(sql_, par_)
+        if data:
+            players = []
+            for player_data in data:
+                player = {"id": int(player_data[0]),
+                        "firstname": str(player_data[1]),
+                        "lastname": str(player_data[2]),
+                        "nickname": str(player_data[3]),
+                        "date_joined": str(player_data[4]),
+                        "date_updated": str(player_data[5])}
+                players.append(player)
+            return players
+        else:
+            logger.error(f"No players found in database!")
+            return None
+
+    def add(self, firstname, lastname, nickname):
         sql_ = f"""INSERT INTO {self.table} VALUES (NULL, :firstname, 
-                  :lastname, :nickname, :arcadename, :email, :date_joined)"""
+                  :lastname, :nickname, :date_joined, date_updated)"""
         par_ = {"firstname": firstname,
                 "lastname": lastname,
                 "nickname": nickname,
-                "arcadename": arcadename,
-                "email": email,
-                "date_joined": datetime.datetime.now()}
+                "date_joined": datetime.datetime.now(),
+                "date_updated": datetime.datetime.now()}
         with dartDB(settings.DB_FILE) as db:
             db.execute(sql_, par_)
 
-    def update(self, id, firstname, lastname, nickname, arcadename, email):
+    def update(self, id, firstname, lastname, nickname):
         sql_ = f"""UPDATE {self.table} SET firstname = :firstname, 
             lastname = :lastname, nickname = :nickname, 
-            arcadename = :arcadename, email = :email 
+            date_updated = :date_updated 
             WHERE id = :id"""
         par_ = {"id": id,
             "firstname": firstname,
             "lastname": lastname,
             "nickname": nickname,
-            "arcadename": arcadename,
-            "email": email}
+            "date_updated": datetime.datetime.now()}
         with dartDB(settings.DB_FILE) as db:
             print(db.execute(sql_, par_))
         
@@ -92,20 +92,3 @@ class Players:
             id = db.fetchone(sql_, par_)
         return id
 
-    def names(self):
-        names = []
-        players = self.fetchall()
-        for player in players:
-            firstname = player["firstname"]
-            lastname = player["lastname"]
-            name = f"{firstname} {lastname}"
-            names.append(name)
-        return names
-
-    def nickname(self):
-        nicknames = []
-        players = self.fetchall()
-        for player in players:
-            nickname = player["nickname"]
-            nicknames.append(nickname)
-        return nicknames
