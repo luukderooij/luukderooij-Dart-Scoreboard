@@ -2,24 +2,23 @@
 
 <!-- Main  -->
 
-<div class="container-fluid main">
 
-    <div class="container-fluid wrapper">
-
-        <h1>PLAYERS</h1>
-
+<main id="main">
+<section>
+    <div class="container-xxl">
+        <h1 class="fs-1 text-center text-bold">Spelers</h1>
+        <h5 class="text-center text-regular">Voeg hier spelers toe!</h5>
+        <div class="d-grid gap-2 col-2 mx-auto">
+            <button type="button" onclick="addPlayer()" class="btn btn-success" style="margin-bottom: 2rem">Speler toevoegen</button>
+        </div>
     </div>
+</section>
 
-</div>
-
-<div class="container-fluid">
-
-    <button type="button" onclick="addPlayer()" class=" btn btn-success" style="margin-bottom: 2rem">Speler
-        toevoegen</button>
-
-    <div id="players_table"></div>
-
-</div>
+<section>
+    <div class="container-xxl">
+        <div id="players_table"></div>
+    </div>
+</section>
 
 <!-- Add player Modal -->
 <div class="modal" id="addPlayerModal">
@@ -45,13 +44,6 @@
 
                     <label for="nname" class="form-label">Bijnaam</label>
                     {{ form.nickname(class="form-control", placeholder="Bijnaam") }}
-
-                    <label for="aname" class="form-label">Arcade</label>
-                    {{ form.arcadename(class="form-control", placeholder="Arcadenaam (3 Letters)") }}
-
-                    <label for="email" class="form-label">E-mail</label>
-                    {{ form.email(class="form-control", placeholder="John@Doe.nl") }}
-
             </div>
 
             <!-- Modal footer -->
@@ -90,13 +82,6 @@
 
                     <label for="nname" class="form-label">Bijnaam</label>
                     {{ form.nickname(class="form-control", id="FormNickname", value="") }}
-
-                    <label for="aname" class="form-label">Arcade</label>
-                    {{ form.arcadename(class="form-control", id="FormArcadename", value="") }}
-
-                    <label for="email" class="form-label">E-mail</label>
-                    {{ form.email(class="form-control", id="FormEmail", value="") }}
-
             </div>
 
             <!-- Modal footer -->
@@ -110,10 +95,86 @@
         </div>
     </div>
 </div>
-
+</main>
 
 {% include 'footer.html' %}
 
 <script>
     players()
+
+
+    function players() {
+    let data = { "type": "players" };
+    let url = '/api/get/players';
+
+    let response = post(url, data).then(response => {
+
+        var customMutatorDate = function (value, data, type, params, component) {
+            let currentDate = new Date(data.date_joined);
+            let date = currentDate.getDate();
+            let month = currentDate.getMonth();
+            let year = currentDate.getFullYear();
+            let dateMonthYear = date + "/" + month + "/" + year;
+            return dateMonthYear
+        }
+
+        var players_table = new Tabulator("#players_table", {
+            data: response, //set initial table data
+            // layout: "fitDataStretch",
+            layout: "fitColumns",
+            resizableColumnFit: true,
+            selectable: 1,
+
+
+            columns: [
+                { title: "#", field: "id", resizable: true, visible: false },
+                { title: "VOORNAAM", field: "firstname", resizable: true },
+                { title: "ACHTERNAAM", field: "lastname", resizable: true },
+                { title: "BIJNAAM", field: "nickname", resizable: true },
+                { title: "ARCADE NAAM", field: "arcadename", resizable: true },
+                { title: "EMAIL", field: "email", resizable: true },
+                { title: "DATE", field: "date_joined", resizable: true, mutator: customMutatorDate }
+            ]
+        });
+
+        players_table.on("rowSelected", function (row) {
+            var selectedData = players_table.getSelectedData();
+
+            document.getElementById("removeButton").value = selectedData[0].id;
+
+            document.getElementById("Formid").value = selectedData[0].id;
+            document.getElementById("FormFirstname").value = selectedData[0].firstname;
+            document.getElementById("FormLastname").value = selectedData[0].lastname;
+            document.getElementById("FormNickname").value = selectedData[0].nickname;
+            document.getElementById("FormArcadename").value = selectedData[0].arcadename;
+            document.getElementById("FormEmail").value = selectedData[0].email;
+
+            var myModal = new bootstrap.Modal(document.getElementById('editPlayerModal'))
+            myModal.show()
+
+        });
+    });
+}
+
+function addPlayer() {
+    var myModal = new bootstrap.Modal(document.getElementById('addPlayerModal'))
+    myModal.show()
+}
+
+function removePlayer(playerId) {
+    if (confirm('Weet je het zeker dat je deze speler wil verwijderen.')) {
+        let data = { playerid: playerId };
+        let url = '/api/remove/player';
+
+        post(url, data)
+        window.location.reload();
+
+    } else {
+        // Do nothing!
+        console.log('Player not removed.');
+    }
+}
+
+
+
 </script>
