@@ -20,7 +20,7 @@ class Darts:
 
     def start(self):
         settings.DATA_DIR = os.path.dirname(os.path.abspath(__file__))
-        print(f"Path installation directory:: {settings.DATA_DIR}")
+        print(f"Path installation directory: {settings.DATA_DIR}")
 
         settings.CONFIG_FILE = os.path.join(settings.DATA_DIR, "config.ini")
         print(f"Path confg.ini: {settings.CONFIG_FILE}")

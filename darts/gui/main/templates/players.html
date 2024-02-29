@@ -1,9 +1,8 @@
 {% include 'header.html' %}
 
 <!-- Main  -->
-
-
 <main id="main">
+
 <section>
     <div class="container-xxl">
         <h1 class="fs-1 text-center text-bold">Spelers</h1>
@@ -33,7 +32,7 @@
 
             <!-- Modal body -->
             <div class="modal-body">
-                <form method="POST" action="/api/add/player">
+                <form method="POST" action="/api/player/add">
                     {{ form.hidden_tag() }}
 
                     <label for="fname" class="form-label">Voornaam</label>
@@ -69,7 +68,7 @@
 
             <!-- Modal body -->
             <div class="modal-body">
-                <form method="POST" action="/api/update/player">
+                <form method="POST" action="/api/player/update">
                     {{ form.hidden_tag() }}
 
                     {{ form.id(type="hidden", id="Formid", value="") }}
@@ -102,20 +101,30 @@
 <script>
     players()
 
-
     function players() {
     let data = { "type": "players" };
     let url = '/api/get/players';
 
     let response = post(url, data).then(response => {
 
-        var customMutatorDate = function (value, data, type, params, component) {
+        var customMutatorDateJoined = function (value, data, type, params, component) {
             let currentDate = new Date(data.date_joined);
             let date = currentDate.getDate();
             let month = currentDate.getMonth();
             let year = currentDate.getFullYear();
             let dateMonthYear = date + "/" + month + "/" + year;
             return dateMonthYear
+        }
+
+        var customMutatorDateUpdated = function (value, data, type, params, component) {
+            let currentDate = new Date(data.date_updated);
+            let minutes = currentDate.getMinutes();
+            let hours = currentDate.getHours();
+            let date = currentDate.getDate();
+            let month = currentDate.getMonth();
+            let year = currentDate.getFullYear();
+            let dateMonthYearTime = date + "/" + month + "/" + year + " " + hours + ":" + minutes;
+            return dateMonthYearTime
         }
 
         var players_table = new Tabulator("#players_table", {
@@ -131,9 +140,8 @@
                 { title: "VOORNAAM", field: "firstname", resizable: true },
                 { title: "ACHTERNAAM", field: "lastname", resizable: true },
                 { title: "BIJNAAM", field: "nickname", resizable: true },
-                { title: "ARCADE NAAM", field: "arcadename", resizable: true },
-                { title: "EMAIL", field: "email", resizable: true },
-                { title: "DATE", field: "date_joined", resizable: true, mutator: customMutatorDate }
+                { title: "DATUM TOEGEVOEGD", field: "date_joined", resizable: true, mutator: customMutatorDateJoined },
+                { title: "DATUM GEUPDATE", field: "date_updated", resizable: true, mutator: customMutatorDateUpdated }
             ]
         });
 
@@ -141,14 +149,10 @@
             var selectedData = players_table.getSelectedData();
 
             document.getElementById("removeButton").value = selectedData[0].id;
-
             document.getElementById("Formid").value = selectedData[0].id;
             document.getElementById("FormFirstname").value = selectedData[0].firstname;
             document.getElementById("FormLastname").value = selectedData[0].lastname;
             document.getElementById("FormNickname").value = selectedData[0].nickname;
-            document.getElementById("FormArcadename").value = selectedData[0].arcadename;
-            document.getElementById("FormEmail").value = selectedData[0].email;
-
             var myModal = new bootstrap.Modal(document.getElementById('editPlayerModal'))
             myModal.show()
 

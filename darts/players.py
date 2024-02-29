@@ -57,7 +57,7 @@ class Players:
 
     def add(self, firstname, lastname, nickname):
         sql_ = f"""INSERT INTO {self.table} VALUES (NULL, :firstname, 
-                  :lastname, :nickname, :date_joined, date_updated)"""
+                  :lastname, :nickname, :date_joined, :date_updated)"""
         par_ = {"firstname": firstname,
                 "lastname": lastname,
                 "nickname": nickname,
