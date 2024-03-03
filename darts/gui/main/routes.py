@@ -37,3 +37,7 @@ def players():
                             form = form)
 
 
+@main.route('/create', methods=['GET', 'POST'])
+def create_tournament():
+    return render_template('create.html',
+                            players=Players().fetchall())
