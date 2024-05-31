@@ -1,0 +1,44 @@
+{% include 'header.html' %}
+
+<!-- Main  -->
+<main id="main">
+
+<section>
+    <div class="container-xxl">
+        <h1 class="fs-1 text-center text-bold">Playoffs</h1>
+
+    </div>
+</section>
+
+
+<section> 
+    <div class="container-xxl">
+        <div class="row">
+
+        </div>
+
+    </div>
+</section>
+
+
+
+
+
+</main>
+
+{% include 'footer.html' %}
+
+<script>
+document.querySelector('button.btn.btn-primary').addEventListener('click', function() {
+    let numberOfRounds = document.getElementById('number_of_rounds').value;
+    let data = new Object()
+    data.number_of_rounds = numberOfRounds;
+
+    post('/api/playoffs/create', data).then(response => {
+        console.log(response);
+    });
+
+
+
+});
+</script>

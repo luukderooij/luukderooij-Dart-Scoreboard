@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="refresh" content="30">
+	<link rel="stylesheet" href="{{ url_for('tv.static', filename='css/scoreboard-style.css') }}">
+	<title>Scoreboard Dubbel 1</title>
+</head>
+
+<body>
+
+	<header class="header">
+		<h1>Dartclub Dubbel 1</h1>
+		<h2>Hall of fame</h2>
+	</header>
+
+	<article class="scoreboard">
+
+		<section class="scoreboard__section">
+
+			<h3>Avond winnaar</h3>
+
+			<div class="scoreboard__container">
+
+				<ul class="title">
+					<li>Nr.</li>
+					<li>Naam</li>
+					<li>Score</li>
+					<li>Datum</li>
+				</ul>
+
+				{% for winner in winners %}
+				<ul>
+					<li>{{loop.index}}</li>
+					<li>{{winner.nickname}}</li>
+					<li>{{winner.score}}</li>
+					<li>{{winner.last_date|format_datetime}}</li>
+				</ul>
+				{% endfor %}
+
+			</div>
+
+		</section>
+
+		<section class="scoreboard__section">
+
+			<h3>Meeste 180's</h3>
+
+			<div class="scoreboard__container">
+
+				<ul>
+					<li>Nr.</li>
+					<li>Naam</li>
+					<li>Score</li>
+					<li>Datum</li>
+				</ul>
+
+				{% for toneighty in toneightys %}
+				<ul>
+					<li>{{loop.index}}</li>
+					<li>{{toneighty.nickname}}</li>
+					<li>{{toneighty.score}}</li>
+					<li>{{toneighty.last_date|format_datetime}}</li>
+				</ul>
+				{% endfor %}
+
+			</div>
+
+		</section>
+
+		<section class="scoreboard__section finish">
+
+			<h3>Hoogste finish</h3>
+
+			<div class="scoreboard__container">
+
+				<ul class>
+					<li>Nr.</li>
+					<li>Naam</li>
+					<li>Score</li>
+					<li>Finish</li>
+					<li>Datum</li>
+				</ul>
+
+				{% for finish in finishes %}
+				<ul>
+					<li>{{loop.index}}</li>
+					<li>{{finish.nickname}}</li>
+					<li>{{finish.score}}</li>
+					<li>{{finish.combi}}</li>
+					<li>{{finish.date|format_datetime}}</li>
+				</ul>
+				{% endfor %}
+
+				</ul>
+
+			</div>
+
+		</section>
+
+	</article>
+
+	<footer class="footer">
+		Made by Luuk Pro & Markel van Gerwen
+	</footer>
+
+</body>
+
+</html>

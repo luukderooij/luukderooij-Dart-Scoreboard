@@ -1,0 +1,192 @@
+{% include 'header.html' %}
+
+<!-- Main  -->
+<main id="main">
+
+<section>
+    <div class="container-xxl">
+        <h1 class="fs-1 text-center text-bold">Toernooi</h1>
+        <h5 class="text-center text-regular">Vul hier de uitslag in!</h5>
+    </div>
+</section>
+
+<section> 
+    <div class="container-xxl">
+        <div id="tournament-score-table"></div>
+    </div>
+</section>
+
+<section> 
+    <div class="container-xxl">
+        <h1>Tussenstand</h1>
+
+        <table class="table table-bordered" id="standings-table">
+
+            <thead>
+
+                <tr>
+                    <th>Poule</th>
+                    <th>Plaats</th>
+                    <th>Speler</th>
+                    <th>Wedstrijden gespeeld</th>
+                    <th>Wedstrijden gewonnen</th>
+                    <th>Wedstrijden verloren</th>
+                    <th>Legs gewonnen</th>
+                    <th>Legs verloren</th>
+                    <th>Legs verschil</th>
+                </tr>
+
+            </thead>
+
+        </table>
+
+    </div>
+</section>
+<section>
+
+    <div class="container-xxl">
+        <div class="d-grid gap-2 col-2 mx-auto">
+            <button type="button" onclick="createPlayoffs()" class="btn btn-success" style="margin-bottom: 2rem">Maak Playoffs</button>
+        </div>
+    </div>
+</section>
+
+
+</main>
+
+{% include 'footer.html' %}
+
+<script>
+
+
+var table = new Tabulator("#tournament-score-table", {
+    ajaxURL: "/api/round-robin-matches/get", //ajax URL
+        ajaxConfig: {
+            method: "POST", //set request type to Position
+            headers: {
+                "Content-type": 'application/json; charset=utf-8', //set specific content type
+            },
+        },
+    layout: "fitDataStretch",
+    columns: [
+        { title: "TOURNAMENT ID", field: "tournament_id", resizable: false, visible: false },
+        { title: "POULE", field: "match_poule_id", resizable: false },
+        { title: "WEDSTRIJD", field: "match_number", resizable: false },
+        { title: "BORD", field: "match_board_id", resizable: false },
+        { title: "SPELER 1", field: "match_team1_id", resizable: false, formatter:function(cell, formatterParams){
+            var value = cell.getValue();
+            return "<span style='color:#3FB449; font-weight:bold;'>" + value + "</span>";}},
+        { title: "SCORE 1", field: "match_team1_score", validator: "integer", editor: true, resizable: false, editorParams:{
+        selectContents:true,
+        }},
+        { title: "SCORE 2", field: "match_team2_score", validator: "integer", editor: true, resizable: false, editorParams:{
+        selectContents:true,
+        }},
+        { title: "SPELER 2", field: "match_team2_id", resizable: false , formatter:function(cell, formatterParams){
+            var value = cell.getValue();
+            return "<span style='color:#3FB449; font-weight:bold;'>" + value + "</span>";}},
+        { title: "SCHEIDSRECHTER", field: "match_referee_id", resizable: false },
+    ],
+});
+
+table.on('cellEdited', (cell) => {
+    var data = cell.getData();
+    // console.log(data);
+    post('/api/round-robin-matches/update', data).then(response => {
+        console.log(response);
+        Update_Standings()
+    });
+})
+  
+
+
+
+async function Standings() {
+    const table = document.getElementById('standings-table')
+    const tbody = document.createElement('tbody')
+    tbody.setAttribute("id", "standings-table-body")
+
+    let url = '/api/round-robin-matches-score/get'
+    let tournament_id = { tournament_id: '0' }
+    let jsonData = await post(url, tournament_id)
+
+    for (let standing of jsonData) {
+        var row = `<tr>
+                <td>${standing.poule}</td>
+                <td>${standing.place}</td>
+                <td>${standing.name}</td>
+                <td>${standing.matches_played}</td>
+                <td>${standing.matches_won}</td>
+                <td>${standing.matches_lost}</td>
+                <td>${standing.legs_scored}</td>
+                <td>${standing.legs_against}</td>
+                <td>${standing.legs_difference}</td>
+                </tr>`
+
+        tbody.innerHTML += row
+    }
+    table.appendChild(tbody)
+}
+
+
+
+async function Update_Standings() {
+    const table = document.getElementById('standings-table')
+    const new_table_body = document.createElement('tbody');
+    new_table_body.setAttribute("id", "standings-table-body")
+    const old_table_body = document.getElementById('standings-table-body')
+
+    console.log('hoawhgioeajgioegjaesiogjfa')
+
+    if (old_table_body) {
+        let url = '/api/round-robin-matches-score/get'
+        let tournament_id = { tournament_id: '0' }
+        let jsonData = await post(url, tournament_id)
+
+        for (let standing of jsonData) {
+            var row = `<tr>
+                    <td>${standing.poule}</td>
+                    <td>${standing.place}</td>
+                    <td>${standing.name}</td>
+                    <td>${standing.matches_played}</td>
+                    <td>${standing.matches_won}</td>
+                    <td>${standing.matches_lost}</td>
+                    <td>${standing.legs_scored}</td>
+                    <td>${standing.legs_against}</td>
+                    <td>${standing.legs_difference}</td>
+                </tr>`
+
+            new_table_body.innerHTML += row
+
+        }
+        table.replaceChild(new_table_body, old_table_body)
+    } else {
+        Standings()
+    }
+
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    Standings()
+});
+
+
+
+function createPlayoffs() {
+    let data = { "a": "a" };
+    let url = '/api/round-robin-matches-played/get';
+
+    let response = post(url, data).then(response => {
+        console.log(response);
+        if (response == true) {
+            console.log('Playoffs created');
+            window.location.href = "playoffs-settings";
+            
+        } 
+        if (response == false) {
+            console.log('Playoffs not created');
+            alert('Playoffs not created');
+        }
+    });
+}
+</script>

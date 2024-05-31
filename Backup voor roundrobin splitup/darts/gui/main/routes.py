@@ -52,8 +52,3 @@ def tournament():
 @main.route('/playoffs-settings', methods=['GET', 'POST'])
 def playoffs_settings():
     return render_template('playoffs-settings.html')
-
-
-@main.route('/playoffs', methods=['GET', 'POST'])
-def playoffs():
-    return render_template('playoffs.html')

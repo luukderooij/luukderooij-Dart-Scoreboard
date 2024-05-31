@@ -1,0 +1,185 @@
+{% include 'header.html' %}
+
+<!-- Main  -->
+<main id="main">
+
+<section>
+    <div class="container-xxl">
+        <h1 class="fs-1 text-center text-bold">Spelers</h1>
+        <h5 class="text-center text-regular">Voeg hier spelers toe!</h5>
+        <div class="d-grid gap-2 col-2 mx-auto">
+            <button type="button" onclick="addPlayer()" class="btn btn-success" style="margin-bottom: 2rem">Speler toevoegen</button>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container-xxl">
+        <div id="players_table"></div>
+    </div>
+</section>
+
+<!-- Add player Modal -->
+<div class="modal" id="addPlayerModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Speler toevoegen</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form method="POST" action="/api/player/add">
+                    {{ form.hidden_tag() }}
+
+                    <label for="fname" class="form-label">Voornaam</label>
+                    {{ form.firstname(class="form-control", placeholder="Voornaam") }}
+
+                    <label for="lname" class="form-label">Achternaam</label>
+                    {{ form.lastname(class="form-control", placeholder="Achternaam") }}
+
+                    <label for="nname" class="form-label">Bijnaam</label>
+                    {{ form.nickname(class="form-control", placeholder="Bijnaam") }}
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                {{ form.submit(class="btn btn-success", value="Toevoegen")}}
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Edit player Modal -->
+<div class="modal" id="editPlayerModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Speler aanpassen</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form method="POST" action="/api/player/update">
+                    {{ form.hidden_tag() }}
+
+                    {{ form.id(type="hidden", id="Formid", value="") }}
+
+                    <label for="fname" class="form-label">Voornaam</label>
+                    {{ form.firstname(class="form-control", id="FormFirstname", value="") }}
+
+                    <label for="lname" class="form-label">Achternaam</label>
+                    {{ form.lastname(class="form-control", id="FormLastname", value="") }}
+
+                    <label for="nname" class="form-label">Bijnaam</label>
+                    {{ form.nickname(class="form-control", id="FormNickname", value="") }}
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" id="removeButton" class="btn btn-danger" onclick="removePlayer(this.value)"
+                    data-bs-dismiss="modal" value="">Verwijderen</button>
+                {{ form.submit(class="btn btn-success", value="Aanpassen")}}
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+</main>
+
+{% include 'footer.html' %}
+
+<script>
+    players()
+
+    function players() {
+    let data = { "type": "players" };
+    let url = '/api/get/players';
+
+    let response = post(url, data).then(response => {
+
+        var customMutatorDateJoined = function (value, data, type, params, component) {
+            let currentDate = new Date(data.date_joined);
+            let date = currentDate.getDate();
+            let month = currentDate.getMonth() + 1;
+            let year = currentDate.getFullYear();
+            let dateMonthYear = date + "/" + month + "/" + year;
+            return dateMonthYear
+        }
+
+        var customMutatorDateUpdated = function (value, data, type, params, component) {
+            let currentDate = new Date(data.date_updated);
+            console.log(currentDate);
+            let minutes = currentDate.getMinutes();
+            let hours = currentDate.getHours();
+            let date = currentDate.getDate();
+            let month = currentDate.getMonth() + 1;
+            let year = currentDate.getFullYear();
+            let dateMonthYearTime = date + "/" + month + "/" + year + " " + hours + ":" + minutes;
+            return dateMonthYearTime
+        }
+
+        var players_table = new Tabulator("#players_table", {
+            data: response, //set initial table data
+            // layout: "fitDataStretch",
+            layout: "fitColumns",
+            resizableColumnFit: true,
+            selectable: 1,
+
+
+            columns: [
+                { title: "#", field: "id", resizable: true, visible: false },
+                { title: "VOORNAAM", field: "firstname", resizable: true },
+                { title: "ACHTERNAAM", field: "lastname", resizable: true },
+                { title: "BIJNAAM", field: "nickname", resizable: true },
+                { title: "DATUM TOEGEVOEGD", field: "date_joined", resizable: true, mutator: customMutatorDateJoined },
+                { title: "DATUM GEUPDATE", field: "date_updated", resizable: true, mutator: customMutatorDateUpdated }
+            ]
+        });
+
+        players_table.on("rowSelected", function (row) {
+            var selectedData = players_table.getSelectedData();
+
+            document.getElementById("removeButton").value = selectedData[0].id;
+            document.getElementById("Formid").value = selectedData[0].id;
+            document.getElementById("FormFirstname").value = selectedData[0].firstname;
+            document.getElementById("FormLastname").value = selectedData[0].lastname;
+            document.getElementById("FormNickname").value = selectedData[0].nickname;
+            var myModal = new bootstrap.Modal(document.getElementById('editPlayerModal'))
+            myModal.show()
+
+        });
+    });
+}
+
+function addPlayer() {
+    var myModal = new bootstrap.Modal(document.getElementById('addPlayerModal'))
+    myModal.show()
+}
+
+function removePlayer(playerId) {
+    if (confirm('Weet je het zeker dat je deze speler wil verwijderen.')) {
+        let data = { playerid: playerId };
+        let url = '/api/remove/player';
+
+        post(url, data)
+        window.location.reload();
+
+    } else {
+        // Do nothing!
+        console.log('Player not removed.');
+    }
+}
+
+
+
+</script>

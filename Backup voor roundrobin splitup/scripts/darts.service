@@ -1,0 +1,15 @@
+[Unit]
+Description=Darts-Scoreboard Daemon
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=darts
+Group=darts
+
+Type=simple
+ExecStart=/usr/bin/python3 /opt/darts/dartsscoreboard.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

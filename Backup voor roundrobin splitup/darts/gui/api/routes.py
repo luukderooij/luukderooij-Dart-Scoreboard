@@ -15,7 +15,6 @@ from wtforms.validators import DataRequired, Length, Email, Optional
 from darts.players import Players 
 from darts.tournament import Tournament
 from darts.playoffs import Playoffs
-from darts.roundrobin import RoundRobin
 from darts.config import settings
 
 from darts.gui.main.routes import RegistrationForm
@@ -148,7 +147,7 @@ def api_get_round_robin_matches():
     tournament_id = tournament.get_tourament_latest_id()
     tournament_data = tournament.get_tournament_data(tournament_id)
     tournament_teams = tournament.get_tournament_teams_data(tournament_id)
-    tournament_matches = RoundRobin().get_tournament_matches_data(tournament_id)
+    tournament_matches = tournament.get_tournament_matches_data(tournament_id)
     tournament_players = tournament.get_tournament_players_data(tournament_id)
 
 
@@ -158,9 +157,9 @@ def api_get_round_robin_matches():
 
             for team in tournament_teams:
                 if value[4] == team[0]:
-                    player1_id = team[4]
+                    player1_id = team[3]
                 if value[6] == team[0]:
-                    player2_id = team[4]
+                    player2_id = team[3]
 
             player1_id = int(player1_id.strip('[]'))
             player2_id = int(player2_id.strip('[]'))
@@ -232,11 +231,7 @@ def api_update_round_robin_matches():
         match_id = data["match_id"]
         team1_score = data["match_team1_score"]
         team2_score = data["match_team2_score"]
-        info = RoundRobin().update_match(tournament_id, match_id, team1_score, team2_score)
-
-        
-        teams = Tournament().get_tournament_teams_data(tournament_id)
-        RoundRobin().create_tournament_standings(tournament_id, teams)
+        info = Tournament().update_match(tournament_id, match_id, team1_score, team2_score)
 
         info = True
         if info == True:
@@ -251,10 +246,10 @@ def api_get_round_robin_matches_score():
     if request.method == 'POST':
         pass
     # data = request.get_json()
-    tournament_id = Tournament().get_tourament_latest_id()
-    players = Tournament().get_player_names(tournament_id)
-
-    tournament_score = RoundRobin().get_tournament_standings(tournament_id)
+    tournament = Tournament()
+    tournament_id = tournament.get_tourament_latest_id()
+    tournament_score = tournament.get_tournament_standings(tournament_id)
+    players = tournament.get_player_names(tournament_id)
 
     score = []
     for poistion in tournament_score:
@@ -289,7 +284,7 @@ def api_get_round_robin_matches_score():
 def are_matches_played():
     tournament = Tournament()
     tournament_id = tournament.get_tourament_latest_id()
-    matches_played = RoundRobin().are_all_matches_played(tournament_id)
+    matches_played = tournament.are_all_matches_played(tournament_id)
     response = make_response(jsonify(matches_played), 200)
     return response
 
@@ -298,15 +293,8 @@ def are_matches_played():
 @api.route('/api/playoffs/create', methods=['GET', 'POST'])
 def create_playoffs():
     if request.method == 'POST':
-        tournament_id = Tournament().get_tourament_latest_id()
-        tournament_score = RoundRobin().get_tournament_standings(tournament_id)
-
-
-
         data = request.get_json()
-        number_of_players = data["number_of_players"]
-        all_players = data["all_players"]
-
-        info = Playoffs().create_playoffs(number_of_players, all_players, tournament_score)
+        number_of_rounds = data["number_of_rounds"]
+        info = Playoffs().create_playoffs(number_of_rounds)
         return jsonify({"response": "Succes"}), 200
     return jsonify({"error": "Invalid request"}), 400
