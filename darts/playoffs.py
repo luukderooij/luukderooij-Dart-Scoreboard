@@ -37,10 +37,7 @@ class Playoffs:
         df = df.iloc[:, :-8]
 
         number_of_poules = df['pouleId'].nunique()
-        # template = playoffs_template()
 
-
-        print(df)
 
         place_to_teamid = dict(zip(df['place'], df['teamId']))
 
@@ -53,13 +50,17 @@ class Playoffs:
 
                     if match['player1']:
                         match['player1'] = place_to_teamid[match['player1']]
+                    else:
+                        match['player1'] = 0
                     if match['player2']:
                         match['player2'] = place_to_teamid[match['player2']]
+                    else:
+                        match['player2'] = 0
 
 
-            for round in template['rounds']:
-                for match in round['matches']:
-                    print(f"Player 1: {match['player1']} - Player 2: {match['player2']}")   
+            # for round in template['rounds']:
+            #     for match in round['matches']:
+            #         print(f"Player 1: {match['player1']} - Player 2: {match['player2']}")   
 
 
         if number_of_poules == 2:
@@ -81,14 +82,6 @@ class Playoffs:
                         match['player2'] = 0
 
 
-        for round in template['rounds']:
-            for match in round['matches']:
-
-
-                print(match['player1'])
-
-
-
         with dartDB(settings.DB_FILE) as db:
             sql_ = "SELECT rowid, * FROM tournament_playoffs_matches WHERE tournament_id = :tournament_id"
             par_ = {"tournament_id": df['tournamentId'].values[0]}
@@ -97,11 +90,6 @@ class Playoffs:
         if not data: 
             for round in template['rounds']:
                 for match in round['matches']:
-
-
-                    print(match['player1'])
-
-
                     date_created = datetime.datetime.now()
                     date_updated = datetime.datetime.now()
                     sql_ = """INSERT INTO tournament_playoffs_matches VALUES (NULL, :tournament_id, :match_id, :team1_id, :team1_score, :team2_id, :team2_score, :p1_last_match_id, :p2_last_match_id, :referee, :board, :date_created, :date_updated)"""
@@ -126,13 +114,79 @@ class Playoffs:
 
 
 
-    def get_tournament_matches_data(self, tournament_id):
-            # Get matches data from a tournament.
-            sql_ = "SELECT * FROM tournament_playoffs_matches WHERE tournament_id = :tournament_id"
-            par_ = {"tournament_id": tournament_id}
-            with dartDB(settings.DB_FILE) as db:
-                data = db.fetchall(sql_, par_)
-            return data
+    def get_matches_data(self, tournament_id):
+        # Get data from playoffs db.
+        sql_ = "SELECT * FROM tournament_playoffs_matches WHERE tournament_id = :tournament_id"
+        par_ = {"tournament_id": tournament_id}
+        with dartDB(settings.DB_FILE) as db:
+            data = db.fetchall(sql_, par_)
+        return data
+
+
+
+    def update_match(self, tournament_id, match_id, team1_score, team2_score):
+        # Update match in db
+
+        sql_ = "UPDATE tournament_playoffs_matches SET team1_score = :score1, team2_score = :score2 WHERE tournament_id = :tournament_id AND match_id = :match_id"
+        par_ = {"score1": team1_score, "score2": team2_score, "tournament_id": tournament_id, "match_id": match_id}
+        with dartDB(settings.DB_FILE) as db:
+            data = db.execute(sql_, par_)
+
+        self.check_matches_played(tournament_id)
+        return data
+
+
+
+
+
+
+    def check_matches_played(self, tournament_id):
+        # Check if all matches are played
+        data = self.get_matches_data(tournament_id)
+
+
+        winners = []
+        for match in data:
+
+            print(match)
+            winner = None
+            if match[4] > 0 or match[6] > 0:
+                if match[4] > match[6]:
+                    winner = match[3]
+                elif match[4] < match[6]:
+                    winner = match[5]
+
+            winners.append({'match_id': match[2], 'winner': winner})
+
+            winner_id_team_1 = 0
+            winner_id_team_2 = 0
+            #check if team1
+            # if match[3] == 0:
+            p1_last_match_id = match[7]
+            if p1_last_match_id:
+                winner_id_team_1 = [match['winner'] for match in winners if match['match_id'] == p1_last_match_id][0]
+                with dartDB(settings.DB_FILE) as db:
+                    sql_ = "UPDATE tournament_playoffs_matches SET team1_id = :team1_id WHERE tournament_id = :tournament_id AND match_id = :match_id"
+                    par_ = {"team1_id": winner_id_team_1, "tournament_id": tournament_id, "match_id": match[2]}
+                    data1 = db.execute(sql_, par_)
+            
+            # if match[5] == 0:
+            p2_last_match_id = match[8]
+            if p2_last_match_id:    
+                winner_id_team_2 = [match['winner'] for match in winners if match['match_id'] == p2_last_match_id][0]
+                with dartDB(settings.DB_FILE) as db:
+                    sql_ = "UPDATE tournament_playoffs_matches SET team2_id = :team2_id WHERE tournament_id = :tournament_id AND match_id = :match_id"
+                    par_ = {"team2_id": winner_id_team_2, "tournament_id": tournament_id, "match_id": match[2]}
+                    data2 = db.execute(sql_, par_)
+
+
+
+
+        return data
+
+
+
+
 
 
 

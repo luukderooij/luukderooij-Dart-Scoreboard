@@ -13,14 +13,18 @@
 
 <section> 
     <div class="container-xxl">
-        <div class="row">
-
-        </div>
-
+        <div id="tournament-score-table"></div>
     </div>
 </section>
 
+<section> 
 
+<div class="container-xxl">
+    <div class="d-grid gap-2 col-2 mx-auto">
+        <button type="button" onclick="goToWinner()" class="btn btn-success" style="margin-bottom: 2rem">Winner</button>
+    </div>
+</div>
+</section>
 
 
 
@@ -29,16 +33,46 @@
 {% include 'footer.html' %}
 
 <script>
-document.querySelector('button.btn.btn-primary').addEventListener('click', function() {
-    let numberOfRounds = document.getElementById('number_of_rounds').value;
-    let data = new Object()
-    data.number_of_rounds = numberOfRounds;
-
-    post('/api/playoffs/create', data).then(response => {
-        console.log(response);
-    });
 
 
-
+var table = new Tabulator("#tournament-score-table", {
+    ajaxURL: "/api/playoffs-matches/get", //ajax URL
+        ajaxConfig: {
+            method: "POST", //set request type to Position
+            headers: {
+                "Content-type": 'application/json; charset=utf-8', //set specific content type
+            },
+        },
+    layout: "fitDataStretch",
+    columns: [
+        { title: "TOURNAMENT ID", field: "tournament_id", resizable: false, visible: false },
+        { title: "WEDSTRIJD", field: "match_number", resizable: false },
+        { title: "BORD", field: "board_id", resizable: false },
+        { title: "SPELER 1", field: "team1_name", resizable: false, formatter:function(cell, formatterParams){
+            var value = cell.getValue();
+            return "<span style='color:#3FB449; font-weight:bold;'>" + value + "</span>";}},
+        { title: "SCORE 1", field: "team1_score", validator: "integer", editor: true, resizable: false, editorParams:{
+        selectContents:true,
+        }},
+        { title: "SCORE 2", field: "team2_score", validator: "integer", editor: true, resizable: false, editorParams:{
+        selectContents:true,
+        }},
+        { title: "SPELER 2", field: "team2_name", resizable: false , formatter:function(cell, formatterParams){
+            var value = cell.getValue();
+            return "<span style='color:#3FB449; font-weight:bold;'>" + value + "</span>";}},
+        { title: "SCHEIDSRECHTER", field: "referee_id", resizable: false },
+    ],
 });
+
+table.on('cellEdited', (cell) => {
+    var data = cell.getData();
+    // console.log(data);
+    post('/api/playoffs-matches/update', data).then(response => {
+        console.log(response);
+        Update_Standings()
+    });
+})
+  
+
+
 </script>
